@@ -1,6 +1,6 @@
-class CreateInterviewSlots < ActiveRecord::Migration[8.1]
+class CreateInterviewSlots < ActiveRecord::Migration[7.0]
   def change
-    create_table :interview_slots do |t|
+    create_table :meeting_slots do |t|
       t.datetime :start_at
       t.datetime :end_at
       t.references :teacher, null: false, foreign_key: true

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class InterviewSlotTest < ActiveSupport::TestCase
+class MeetingSlotTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

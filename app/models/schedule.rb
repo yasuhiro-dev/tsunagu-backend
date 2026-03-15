@@ -1,4 +1,4 @@
 class Schedule < ApplicationRecord
     has_many :children
-    has_many :interview_slots
+    has_many :meeting_slots
 end

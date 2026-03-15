@@ -79,7 +79,7 @@ teachers.each do |teacher|
 
 start_time = Time.parse("#{date} 15:00")
   8.times do 
-InterviewSlot.find_or_create_by!(
+MeetingSlot.find_or_create_by!(
   schedule: schedule,
   status: :available,
   teacher:teacher,
@@ -94,20 +94,20 @@ end
 end
 
 Child.all.each do |child|
-    slot = InterviewSlot.available.first
+    slot = MeetingSlot.available.first
     break if slot.nil?
     Assignment.find_or_create_by!(
         child:child,
-        interview_slot:slot
+        meeting_slot:slot
     )
     slot.update!(status: :reserved)
 end
 
 Family.all.each do |family|
-InterviewSlot.all.sample(2).each do |slot|
+MeetingSlot.all.sample(2).each do |slot|
     FamilyUnavailability.find_or_create_by!(
         family:family,
-        interview_slot:slot
+        meeting_slot:slot
     )
     end
 end

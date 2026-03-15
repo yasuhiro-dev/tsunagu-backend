@@ -1,4 +1,4 @@
 class Assignment < ApplicationRecord
   belongs_to :child
-  belongs_to :interview_slot
+  belongs_to :meeting_slot
 end

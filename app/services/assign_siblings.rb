@@ -15,7 +15,7 @@ class AssignSiblings
 
       count = siblings.size
 
-      slots = @schedule.interview_slots.order(:start_at)
+      slots = @schedule.meeting_slots.order(:start_at)
 
       slots.each_cons(count) do |slot_group|
 
@@ -27,7 +27,7 @@ class AssignSiblings
 
             Assignment.create!(
               child: child,
-              interview_slot: slot
+              meeting_slot: slot
             )
 
             slot.update!(status: "reserved")

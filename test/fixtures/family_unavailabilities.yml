@@ -2,8 +2,8 @@
 
 one:
   family: one
-  interview_slot: one
+  meeting_slot: one
 
 two:
   family: two
-  interview_slot: two
+  meeting_slot: two
