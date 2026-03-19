@@ -1,5 +1,4 @@
 class Teacher < ApplicationRecord
-
    has_many :class_rooms
   has_many :meeting_slots
 
