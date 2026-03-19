@@ -1,5 +1,5 @@
 class Child < ApplicationRecord
-  belongs_to :family 
+  belongs_to :family
   has_many :assignments
   belongs_to :schedule
   has_many :child_class_rooms
