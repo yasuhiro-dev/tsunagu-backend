@@ -1,5 +1,5 @@
 class ScheduleService
-  def initialize(schedule,groups)
+  def initialize(schedule, groups)
     @schedule = schedule
     @groups = groups
   end
@@ -8,9 +8,8 @@ class ScheduleService
     GroupChildren.new(@schedule).call
 
     AssignSiblings.new(@schedule).call
-    AssignSupport.new(@schedule,@groups).call
+    AssignSupport.new(@schedule, @groups).call
     AssignTimeConstraints.new(@schedule).call
     AssignNormal.new(@schedule).call
-    
   end
 end

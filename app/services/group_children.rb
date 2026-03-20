@@ -17,7 +17,6 @@ class GroupChildren
     siblings = children.group_by(&:family_id)
 
     siblings.each do |family_id, family_children|
-
       if family_children.size > 1
         groups << family_children
 
@@ -30,11 +29,10 @@ class GroupChildren
             { child: child, type: :support }
           ]
         else
-          groups << [child]
+          groups << [ child ]
         end
 
       end
-
     end
 
     groups
