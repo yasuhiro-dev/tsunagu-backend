@@ -9,7 +9,7 @@ class ScheduleService
 
     AssignSiblings.new(@schedule).call
     AssignSupport.new(@schedule, @groups).call
-    AssignTimeConstraints.new(@schedule).call
+    if time_ok?(family, slot)
     AssignNormal.new(@schedule).call
   end
 end
