@@ -6,13 +6,14 @@ def initialize(schedule, groups)
 end
 
 def call
-    @groups.each do |group|
-         puts "group処理中"
+  @groups.each do |group|
     next unless support_group?(group)
+
     child = group.first[:child]
     next if child.assignments.exists?
+
     assign_support(child)
-end
+  end
 end
 
 private
