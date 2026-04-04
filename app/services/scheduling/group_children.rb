@@ -23,7 +23,7 @@ module Scheduling
               { child: child, type: :support }
             ]
           else
-            groups << [{ child: child, type: :normal }]
+            groups << [ { child: child, type: :normal } ]
           end
         end
       end
