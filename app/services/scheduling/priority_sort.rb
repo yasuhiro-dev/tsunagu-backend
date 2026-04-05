@@ -18,4 +18,4 @@ module Scheduling
         score
     end 
   end
-end
+end 
