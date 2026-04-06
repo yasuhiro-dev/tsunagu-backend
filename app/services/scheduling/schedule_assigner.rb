@@ -13,7 +13,7 @@ module Scheduling
         slots = SupportFilter.new.call(slots, group)
         slots = TimeFilter.new.call(slots, group)
         next if slots.empty?
-        assign(slots, group)
+        Assigner.new.call(slots, group)
         end
     end
   end
