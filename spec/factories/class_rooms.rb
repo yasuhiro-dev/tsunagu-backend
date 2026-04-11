@@ -4,6 +4,6 @@ FactoryBot.define do
     classname { "5年3組" }
     grade { 5 }
     section { 3 }
-    room_type { "normal" }
+    room_type { 0 }
   end
 end
