@@ -11,8 +11,8 @@ RSpec.describe Scheduling::Assigner do
 
       slot = create(:meeting_slot, teacher_id: class_room.teacher_id)
 
-      group = [{ type: :normal, child: child }]
-      slots = [slot]
+      group = [ { type: :normal, child: child } ]
+      slots = [ slot ]
 
       # 実行
       result = Scheduling::Assigner.new.call(slots, group)
