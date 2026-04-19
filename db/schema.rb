@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_15_050800) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_18_140323) do
   create_table "assignments", force: :cascade do |t|
     t.integer "child_id", null: false
     t.datetime "created_at", null: false
@@ -93,10 +93,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_050800) do
     t.integer "year"
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
   create_table "teachers", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
     t.integer "role"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email_address"
+    t.string "password_digest"
     t.datetime "updated_at", null: false
   end
 
@@ -113,4 +129,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_050800) do
   add_foreign_key "family_unavailabilities", "meeting_slots"
   add_foreign_key "meeting_slots", "schedules"
   add_foreign_key "meeting_slots", "teachers"
+  add_foreign_key "sessions", "users"
 end
