@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       get "health_check", to: "health_check#index"
       post "/login", to: "sessions#create"
       get "/meeting_slots", to: "meeting_slots#index"
+      post "/users", to: "users#create"
     end
   end
 end
