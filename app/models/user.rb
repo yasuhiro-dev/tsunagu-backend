@@ -7,6 +7,6 @@ after_create :create_teacher
 
 private
     def create_teacher
-        Teacher.create!(user:self)
+        Teacher.create!(user: self)
     end
 end
