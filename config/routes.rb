@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       post "/login", to: "sessions#create"
       get "/meeting_slots", to: "meeting_slots#index"
       post "/users", to: "users#create"
+      post "/family_unavailabilities", to: "family_unavailabilities#create"
     end
   end
 end
