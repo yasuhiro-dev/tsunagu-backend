@@ -6,6 +6,7 @@ Rails.application.routes.draw do
       get "/meeting_slots", to: "meeting_slots#index"
       post "/users", to: "users#create"
       post "/family_unavailabilities", to: "family_unavailabilities#create"
+      delete "/family_unavailabilities/:meeting_slot_id", to: "family_unavailabilities#destroy"
     end
   end
 end
