@@ -6,4 +6,12 @@ class Api::V1::FamilyUnavailabilitiesController < ApplicationController
         )
         render json: unavailability, status: :created
     end
+        def destroy
+            family = current_user.family
+            unavailabilities = family.family_unavailabilities.find_by!(
+                meeting_slot_id: params[:meeting_slot_id]
+            )
+            unavailabilities.destroy!
+            render json: { message: "delete" }, status: :ok
+        end
 end
