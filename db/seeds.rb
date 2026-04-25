@@ -36,7 +36,16 @@ end
 family=[ "朝日", "浅見", "薄井", "大友", "大貫", "川上", "菊地", "木谷", "栗原", "杉本", "永井", "三代", "池田" ]
 
 family.each do |family_name|
-    Family.find_or_create_by!(name: family_name)
+    family= Family.find_or_create_by!(name: family_name)
+    unless family.user.present?
+    user = User.find_or_create_by!(
+      email_address:
+      "#{family_name}@example.com") do |u|
+      u.password = "password"
+      u.role = "parent"
+    end
+    family.update(user: user)
+    end
 end
 
 child=[
@@ -77,12 +86,13 @@ teachers.each do |teacher|
 start_time = Time.parse("#{date} 15:00")
   8.times do
 MeetingSlot.find_or_create_by!(
-  schedule: schedule,
-  status: :available,
+ schedule: schedule,
   teacher: teacher,
   start_at: start_time,
-  end_at: start_time+15.minutes
-)
+  end_at: start_time + 15.minutes
+     ) do |slot|
+  slot.status = :available
+end
 
 start_time += 15.minutes
 end
