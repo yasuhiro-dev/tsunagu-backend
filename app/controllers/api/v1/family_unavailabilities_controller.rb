@@ -1,4 +1,10 @@
 class Api::V1::FamilyUnavailabilitiesController < ApplicationController
+    def index
+        family = current_user.family
+        unavailabilities = family.family_unavailabilities.pluck(:meeting_slot_id)
+        render json: unavailabilities, status: :ok
+    end
+
     def create
         family = current_user.family
         unavailability = family.family_unavailabilities.create!(

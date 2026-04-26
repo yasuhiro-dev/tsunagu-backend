@@ -101,7 +101,7 @@ Child.all.each do |child|
         meeting_slot: slot
     )
     slot.update!(status: :reserved)
-end 
+end
 
 Family.all.each do |family|
   MeetingSlot.all.sample(2).uniq.each do |slot|
