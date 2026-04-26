@@ -33,30 +33,24 @@ classes.each do |grade, section, teacher_name, class_name, room_type|
 end
 end
 
-family=[ "朝日", "浅見", "薄井", "大友", "大貫", "川上", "菊地", "木谷", "栗原", "杉本", "永井", "三代", "池田" ]
-
-family.each do |family_name|
-    family= Family.find_or_create_by!(name: family_name)
-    unless family.user.present?
-    user = User.find_or_create_by!(
-      email_address:
-      "#{family_name}@example.com") do |u|
-      u.password = "password"
-      u.role = "parent"
-    end
-    family.update(user: user)
-    end
+family_names = [ "朝日", "浅見", "薄井", "大友", "大貫", "川上", "菊地", "木谷", "栗原", "杉本", "永井", "三代", "池田" ]
+family_names.each do |family_name|
+  user = User.find_or_create_by!(email_address: "#{family_name}@example.com") do |u|
+    u.password = "password"
+    u.role = "parent"
+  end
+  user.family.update!(name: family_name)
 end
 
 child=[
-    [ "朝日晴信", 1, 5, 1 ], [ "浅見祐奈", 2, 5, 1 ], [ "薄井玲那", 3, 5, 1 ], [ "大友朝日", 4, 5, 1 ],
-    [ "大貫雄星", 5, 5, 1 ], [ "川上結衣", 6, 5, 1 ], [ "菊地英信", 7, 5, 1 ], [ "木谷隼也", 8, 5, 1 ],
-    [ "栗原寛太", 9, 5, 1 ], [ "杉本響", 10, 5, 1 ], [ "永井薫", 11, 5, 2 ], [ "三代裕", 12, 0, 1 ],
-    [ "薄井公平", 3, 6, 2 ], [ "大友静子", 4, 6, 1 ]
+    [ "朝日晴信", "朝日", 5, 1 ], [ "浅見祐奈", "浅見", 5, 1 ], [ "薄井玲那", "薄井", 5, 1 ], [ "大友朝日", "大友", 5, 1 ],
+    [ "大貫雄星", "大貫", 5, 1 ], [ "川上結衣", "川上", 5, 1 ], [ "菊地英信", "菊地", 5, 1 ], [ "木谷隼也", "木谷", 5, 1 ],
+    [ "栗原寛太", "栗原", 5, 1 ], [ "杉本響", "杉本", 5, 1 ], [ "永井薫", "永井", 5, 2 ], [ "三代裕", "三代", 0, 1 ],
+    [ "薄井公平", "薄井", 6, 2 ], [ "大友静子", "大友", 6, 1 ]
 ]
 
-child.each do |child_name, family_id, grade, section|
-    family= Family.find(family_id)
+child.each do |child_name, family_name, grade, section|
+    family = Family.find_by!(name: family_name)
 
     class_room= ClassRoom.find_by!(
          grade: grade,
@@ -110,10 +104,10 @@ Child.all.each do |child|
 end
 
 Family.all.each do |family|
-MeetingSlot.all.sample(2).each do |slot|
+  MeetingSlot.all.sample(2).uniq.each do |slot|
     FamilyUnavailability.find_or_create_by!(
-        family: family,
-        meeting_slot: slot
+      family: family,
+      meeting_slot: slot
     )
-    end
+  end
 end
