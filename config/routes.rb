@@ -8,6 +8,7 @@ Rails.application.routes.draw do
       get "/family_unavailabilities", to: "family_unavailabilities#index"
       post "/family_unavailabilities", to: "family_unavailabilities#create"
       delete "/family_unavailabilities/:meeting_slot_id", to: "family_unavailabilities#destroy"
+      post "/schedules", to:"schedules#create"
     end
   end
 end
