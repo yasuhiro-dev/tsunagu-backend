@@ -13,7 +13,7 @@ module Scheduling
                                          .where(room_type: "normal")
                                          .first&.teacher_id
         normal_slot = slots.find { |s| s.teacher_id == normal_teacher_id }
-        next if normal_slot.nil? 
+        next if normal_slot.nil?
         slots.find { |s| s.teacher_id == support_teacher_id && consecutive?(normal_slot, s) }
       end.compact
 
