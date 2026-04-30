@@ -78,7 +78,7 @@ end
 teachers.each do |teacher|
   dates.each do |date|
 start_time = Time.parse("#{date} 15:00")
-  8.times do
+  6.times do
 MeetingSlot.find_or_create_by!(
  schedule: schedule,
   teacher: teacher,
