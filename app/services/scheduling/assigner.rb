@@ -12,6 +12,7 @@ module Scheduling
         child_id: g[:child].id,
         meeting_slot_id: slot.id
       )
+      slot.update!(status: "reserved")
       end
     end
   end
