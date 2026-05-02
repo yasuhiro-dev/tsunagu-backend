@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       post "/family_unavailabilities", to: "family_unavailabilities#create"
       delete "/family_unavailabilities/:meeting_slot_id", to: "family_unavailabilities#destroy"
       post "/schedules", to: "schedules#create"
+      get "/all_meeting_slots", to: "meeting_slots#all"
     end
   end
 end
