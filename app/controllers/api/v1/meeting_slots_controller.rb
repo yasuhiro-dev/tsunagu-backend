@@ -13,7 +13,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
       child_name: slot.assignments.first&.child&.name
     }
   }
-end 
+end
 def index
   if current_user.role == "teacher"
     teacher = current_user.teacher
