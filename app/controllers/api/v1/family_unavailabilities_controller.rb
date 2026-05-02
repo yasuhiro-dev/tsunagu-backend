@@ -1,4 +1,5 @@
 class Api::V1::FamilyUnavailabilitiesController < ApplicationController
+    before_action :authenticate_user! 
     def index
         family = current_user.family
         unavailabilities = family.family_unavailabilities.pluck(:meeting_slot_id)
