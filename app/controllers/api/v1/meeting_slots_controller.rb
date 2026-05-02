@@ -29,6 +29,6 @@ def index
         end_at: a.meeting_slot.end_at
         }
       }
-    end
-  end  
+  end
+  end
 end
