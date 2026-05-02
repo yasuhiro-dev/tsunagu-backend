@@ -13,24 +13,35 @@ schedule = Schedule.find_or_create_by!(
 
 
 
-classes=[
-    [ 1, 1, "埜口", "1年1組", :normal ], [ 1, 2, "高畠", "1年2組", :normal ],  [ 2, 1, "黒羽", "2年1組", :normal ],
-    [ 2, 2, "石井", "2年2組", :normal ], [ 3, 1, "益子", "3年1組", :normal ], [ 3, 2, "稲葉", "3年2組", :normal ],
-    [ 4, 1, "大森", "4年1組", :normal ], [ 4, 2, "武藤", "4年2組", :normal ], [ 5, 1, "有坂", "5年1組", :normal ],
-    [ 5, 2, "米川", "5年2組", :normal ], [ 6, 1, "小泉", "6年1組", :normal ], [ 6, 2, "緑川", "6年2組", :normal ],
-    [ 0, 1, "園部", "ひまわり", :support ]
+classes = [
+  [ 1, 1, "埜口", "1年1組", :normal ],
+  [ 1, 2, "高畠", "1年2組", :normal ],
+  [ 2, 1, "黒羽", "2年1組", :normal ],
+  [ 2, 2, "石井", "2年2組", :normal ],
+  [ 3, 1, "益子", "3年1組", :normal ],
+  [ 3, 2, "稲葉", "3年2組", :normal ],
+  [ 4, 1, "大森", "4年1組", :normal ],
+  [ 4, 2, "武藤", "4年2組", :normal ],
+  [ 5, 1, "有坂", "5年1組", :normal ],
+  [ 5, 2, "米川", "5年2組", :normal ],
+  [ 6, 1, "小泉", "6年1組", :normal ],
+  [ 6, 2, "緑川", "6年2組", :normal ],
+  [ 0, 1, "園部", "ひまわり", :support ]
 ]
-classes.each do |grade, section, teacher_name, class_name, room_type|
-    teacher=Teacher.find_or_create_by!(name: teacher_name)
 
-    ClassRoom.find_or_create_by!(
-  grade: grade,
-  section: section
-) do |c|
-  c.classname = class_name
-  c.teacher = teacher
-  c.room_type = room_type
-end
+classes.each do |grade, section, teacher_name, class_name, room_type|
+  user = User.find_or_create_by!(email_address: "#{teacher_name}@example.com") do |u|
+    u.password = "password"
+    u.role = "teacher"
+  end
+  teacher = user.teacher
+  teacher.update!(name: teacher_name)
+
+  ClassRoom.find_or_create_by!(grade: grade, section: section) do |c|
+    c.classname = class_name
+    c.teacher = teacher
+    c.room_type = room_type
+  end
 end
 
 family_names = [ "朝日", "浅見", "薄井", "大友", "大貫", "川上", "菊地", "木谷", "栗原", "杉本", "永井", "三代", "池田" ]
