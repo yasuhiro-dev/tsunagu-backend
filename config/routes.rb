@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       delete "/family_unavailabilities/:meeting_slot_id", to: "family_unavailabilities#destroy"
       post "/schedules", to: "schedules#create"
       get "/all_meeting_slots", to: "meeting_slots#all"
+      get "/admin/users", to: "admin#index"
     end
   end
 end
