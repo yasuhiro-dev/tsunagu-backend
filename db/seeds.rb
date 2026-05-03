@@ -11,6 +11,10 @@ schedule = Schedule.find_or_create_by!(
   name: "2026年個別面談",
   year: 2026)
 
+  User.find_or_create_by!(email_address: "admin@example.com") do |u|
+  u.password="password"
+  u.role="admin"
+end
 
 
 classes = [

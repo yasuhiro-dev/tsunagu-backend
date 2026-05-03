@@ -5,14 +5,16 @@ module Scheduling
       return slots unless siblings_group?(group)
 
       normal_entries = group.select { |g|g[:type]==:normal }
-      child_slots = normal_entries.map do |entry|
+      child_slot_candidates = normal_entries.map do |entry|
         teacher_id = entry[:child].class_rooms.where(room_type: "normal")
         .first&.teacher_id
-        slots.find { |s|s.teacher_id==teacher_id }
-      end.compact
+        slots.select { |s|s.teacher_id==teacher_id }
+      end
 
-      child_slots.permutation.each do |ordered_slots|
-        return slots if consecutive?(ordered_slots)
+      child_slot_candidates.first.product(*child_slot_candidates[1..]).each do |combo|
+        combo.permutation.each do |ordered|
+          return ordered if consecutive?(ordered)
+        end
       end
       []
     end
