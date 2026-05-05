@@ -1,24 +1,32 @@
 module Scheduling
   class SupportFilter
     SLOT_INTERVAL_MINUTES = 15
+
     def call(slots, group)
       return slots unless support_group?(group)
-      support_entries = group.select { |g| g[:type] == :support }
-      support_slots = support_entries.map do |entry|
-        support_teacher_id = entry[:child].class_rooms
-                                         .where(room_type: "support")
-                                         .first&.teacher_id
-        next if support_teacher_id.nil?
-        normal_teacher_id = entry[:child].class_rooms
-                                         .where(room_type: "normal")
-                                         .first&.teacher_id
-        normal_slot = slots.find { |s| s.teacher_id == normal_teacher_id }
-        next if normal_slot.nil?
-        slots.find { |s| s.teacher_id == support_teacher_id && consecutive?(normal_slot, s) }
-      end.compact
 
-      return slots if support_slots.empty?
-      slots + support_slots
+      support_entry = group.find { |g| g[:type] == :support }
+      support_teacher_id = support_entry[:child].class_rooms
+                                                .where(room_type: "support")
+                                                .first&.teacher_id
+      return [] if support_teacher_id.nil?
+
+      normal_teacher_id = support_entry[:child].class_rooms
+                                               .where(room_type: "normal")
+                                               .first&.teacher_id
+
+      normal_slots = slots.select { |s| s.teacher_id == normal_teacher_id }
+      return [] if normal_slots.empty?
+
+      normal_slots.each do |normal_slot|
+        support_slot = slots.find { |s|
+          s.teacher_id == support_teacher_id &&
+          consecutive?(normal_slot, s)
+        }
+        return [normal_slot, support_slot] if support_slot
+      end
+
+      []
     end
 
     private
