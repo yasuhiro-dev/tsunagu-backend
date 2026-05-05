@@ -77,13 +77,19 @@ child = Child.find_or_create_by!(name: child_name) do |c|
   c.schedule = schedule
 end
 
+
 ChildClassRoom.find_or_create_by!(
   child: child,
   class_room: class_room
 )
 end
 
-
+child_miro = Child.find_by!(name: "三代裕")
+normal_class = ClassRoom.find_by!(grade: 5, section: 1)
+ChildClassRoom.find_or_create_by!(
+  child: child_miro,
+  class_room: normal_class
+)
 teachers = Teacher.all
 start_date = Date.parse("2026-06-01")
 dates = 5.times.map do |i|
