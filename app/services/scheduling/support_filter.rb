@@ -23,7 +23,7 @@ module Scheduling
           s.teacher_id == support_teacher_id &&
           consecutive?(normal_slot, s)
         }
-        return [normal_slot, support_slot] if support_slot
+        return [ normal_slot, support_slot ] if support_slot
       end
 
       []
