@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       post "/schedules", to: "schedules#create"
       get "/all_meeting_slots", to: "meeting_slots#all"
       get "/admin/users", to: "admin#index"
+      get "/class_rooms", to: "class_rooms#index"
     end
   end
 end
