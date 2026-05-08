@@ -10,7 +10,7 @@ class Api::V1::UsersController < ApplicationController
         raise ActiveRecord::Rollback
       end
 
-     # ② 自動作成されたfamilyを取得して名前を更新
+# ② 自動作成されたfamilyを取得して名前を更新
 @family = @user.family
 @family.update(name: params[:family_name])
 
