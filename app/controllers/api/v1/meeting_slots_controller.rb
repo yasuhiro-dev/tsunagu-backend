@@ -4,6 +4,8 @@ class Api::V1::MeetingSlotsController < ApplicationController
  family = current_user.family
   teacher_ids = family.children.flat_map { |child| child.class_rooms.map(&:teacher_id) }
   slots = MeetingSlot.where(teacher_id: teacher_ids)
+
+  slots = slots.group_by(&:start_at).map { |_, s| s.first }
   render json: slots.map { |slot|
     {
       id: slot.id,
