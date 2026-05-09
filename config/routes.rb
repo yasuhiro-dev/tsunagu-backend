@@ -12,6 +12,7 @@ Rails.application.routes.draw do
       get "/admin/users", to: "admin#index"
       get "/class_rooms", to: "class_rooms#index"
       post "/users/parent", to: "users#create_parent"
+      post "/admin/teachers", to: "admin#create_teacher"
     end
   end
 end
