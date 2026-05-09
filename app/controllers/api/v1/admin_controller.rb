@@ -18,4 +18,39 @@ class Api::V1::AdminController < ApplicationController
                children_name: u.family&.children&.map(&:name)
             }} }, status: :ok
     end
+    def create_teacher
+        ActiveRecord::Base.transaction do
+            @user=User.new(teacher_params)
+            @user.role = "teacher"
+            unless @user.save
+                render json: { error: @user.errors.full_messages },
+                status: :unprocessable_entity
+                raise ActiveRecord::Rollback
+            end
+            @teacher=@user.teacher
+            @teacher.update(name: params[:name])
+
+            @class_room=ClassRoom.find(params[:class_room_id])
+            @class_room.update(teacher_id: @teacher.id)
+        end
+
+        return if performed?
+
+        render json: {
+            user: {
+                id: @user.id,
+                email_address: @user.email_address
+            },
+            teacher: {
+                id: @teacher.id,
+                name: @teacher.name,
+                class_room: @class_room.classname
+            }
+            }, status: :created
+    end
+    private
+
+def teacher_params
+  params.require(:user).permit(:email_address, :password)
+end
 end
