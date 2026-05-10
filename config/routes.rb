@@ -13,6 +13,8 @@ Rails.application.routes.draw do
       get "/class_rooms", to: "class_rooms#index"
       post "/users/parent", to: "users#create_parent"
       post "/admin/teachers", to: "admin#create_teacher"
+      delete "/admin/teachers/:id", to: "admin#destroy"
+      delete "/admin/parents/:id", to: "admin#destroy"
     end
   end
 end
