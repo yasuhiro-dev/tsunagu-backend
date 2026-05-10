@@ -36,6 +36,7 @@ class Api::V1::UsersController < ApplicationController
     return if performed?
 
     render json: {
+      token: encode_token({ user_id: @user.id }),
       user: {
         id: @user.id,
         email_address: @user.email_address

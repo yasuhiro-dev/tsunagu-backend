@@ -18,6 +18,7 @@ class Api::V1::AdminController < ApplicationController
                children_name: u.family&.children&.map(&:name)
             }} }, status: :ok
     end
+
     def create_teacher
         ActiveRecord::Base.transaction do
             @user=User.new(teacher_params)
@@ -33,7 +34,6 @@ class Api::V1::AdminController < ApplicationController
             @class_room=ClassRoom.find(params[:class_room_id])
             @class_room.update(teacher_id: @teacher.id)
         end
-
         return if performed?
 
         render json: {
@@ -48,6 +48,11 @@ class Api::V1::AdminController < ApplicationController
             }
             }, status: :created
     end
+      def destroy
+            user = User.find(params[:id])
+            user.destroy!
+            render json: { message: "削除しました" }, status: :ok
+        end
     private
 
 def teacher_params
