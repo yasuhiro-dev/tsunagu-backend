@@ -15,7 +15,10 @@ class Api::V1::AdminController < ApplicationController
                 id: u.id,
                email_address: u.email_address,
                name: u.family&.name,
-               children_name: u.family&.children&.map(&:name)
+               children_name: u.family&.children&.map(&:name),
+               children_class: u.family&.children&.map do |c|
+  c.class_rooms.map { |cr| "#{cr.grade}年#{cr.section}組" }.join(", ")
+end
             }} }, status: :ok
     end
 
@@ -34,6 +37,7 @@ class Api::V1::AdminController < ApplicationController
             @class_room=ClassRoom.find(params[:class_room_id])
             @class_room.update(teacher_id: @teacher.id)
         end
+
         return if performed?
 
         render json: {
@@ -53,6 +57,26 @@ class Api::V1::AdminController < ApplicationController
             user.destroy!
             render json: { message: "削除しました" }, status: :ok
         end
+
+    def update
+        ActiveRecord::Base.transaction do
+            user = User.find(params[:id])
+
+            user.update!(email_address: params[:email_address]) if params[:email_address]
+            user.update!(password: params[:password]) if params[:password]
+
+            if user.role == "teacher"
+                user.teacher.update!(name: params[:name]) if params[:name]
+                if params[:class_room_id]
+                    ClassRoom.where(teacher_id: [ user.teacher.id ]).update_all(teacher_id: nil)
+                    class_room = ClassRoom.find(params[:class_room_id])
+                    class_room.update!(teacher_id: user.teacher.id)
+                end
+            end
+        end
+    end
+
+
     private
 
 def teacher_params
