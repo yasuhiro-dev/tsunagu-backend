@@ -30,7 +30,7 @@ end
     def consecutive?(slots)
       slots.each_cons(2).all? do |s1, s2|
         s2.start_at == s1.start_at + SLOT_INTERVAL_MINUTES*60 &&
-        s1.start_at.to_date == s2.start_at.to_date 
+        s1.start_at.to_date == s2.start_at.to_date
       end
     end
   end
