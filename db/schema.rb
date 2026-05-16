@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_23_142924) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_10_125412) do
   create_table "assignments", force: :cascade do |t|
     t.integer "child_id", null: false
     t.datetime "created_at", null: false
@@ -54,7 +54,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_142924) do
     t.integer "grade"
     t.integer "room_type"
     t.integer "section"
-    t.integer "teacher_id", null: false
+    t.integer "teacher_id"
     t.datetime "updated_at", null: false
     t.index ["teacher_id"], name: "index_class_rooms_on_teacher_id"
   end

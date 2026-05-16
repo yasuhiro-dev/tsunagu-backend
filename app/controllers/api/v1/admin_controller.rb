@@ -18,6 +18,7 @@ class Api::V1::AdminController < ApplicationController
   children_name: u.family&.children&.map(&:name)&.join("、"),
   children_class: u.family&.children&.map { |c| c.class_rooms.first&.then { |r| "#{r.grade}年#{r.section}組" } }&.join("、")
 } } }, status: :ok
+
     end
 
     def create_teacher
@@ -35,6 +36,7 @@ class Api::V1::AdminController < ApplicationController
             @class_room=ClassRoom.find(params[:class_room_id])
             @class_room.update(teacher_id: @teacher.id)
         end
+
         return if performed?
 
         render json: {
@@ -54,6 +56,7 @@ class Api::V1::AdminController < ApplicationController
             user.destroy!
             render json: { message: "削除しました" }, status: :ok
         end
+
         def update_teacher
   teacher = User.find(params[:id]).teacher
   teacher.update!(name: params[:name])
@@ -84,6 +87,7 @@ def update_parent
   end
   render json: { message: "更新しました" }, status: :ok
 end
+
     private
 
 def teacher_params

@@ -1,10 +1,10 @@
 module Scheduling
   class SiblingsFilter
     SLOT_INTERVAL_MINUTES = 15
+
    def call(slots, group)
   return slots unless siblings_group?(group)
 
-  # 最初に時間不可IDを取得しておく
   unavailable_ids = group.map { |g| g[:child] }
                          .flat_map { |child| child.family.family_unavailabilities.pluck(:meeting_slot_id) }
                          .uniq
@@ -18,6 +18,7 @@ module Scheduling
   child_slot_candidates.first.product(*child_slot_candidates[1..]).each do |combo|
     combo.permutation.each do |ordered|
       next if ordered.any? { |s| unavailable_ids.include?(s.id) }  # 時間不可を弾く
+
       return ordered if consecutive?(ordered)
     end
   end
@@ -32,7 +33,8 @@ end
 
     def consecutive?(slots)
       slots.each_cons(2).all? do |s1, s2|
-        s2.start_at == s1.start_at + SLOT_INTERVAL_MINUTES*60
+        s2.start_at == s1.start_at + SLOT_INTERVAL_MINUTES*60 &&
+        s1.start_at.to_date == s2.start_at.to_date
       end
     end
   end
