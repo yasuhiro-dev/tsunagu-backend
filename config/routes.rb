@@ -15,6 +15,9 @@ Rails.application.routes.draw do
       post "/admin/teachers", to: "admin#create_teacher"
       delete "/admin/teachers/:id", to: "admin#destroy"
       delete "/admin/parents/:id", to: "admin#destroy"
+      get "/admin/parents/:id", to: "admin#show_parent"
+patch "/admin/parents/:id", to: "admin#update_parent"
+patch "/admin/teachers/:id", to: "admin#update_teacher"
     end
   end
 end
