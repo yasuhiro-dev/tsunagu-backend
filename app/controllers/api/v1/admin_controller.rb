@@ -16,9 +16,8 @@ class Api::V1::AdminController < ApplicationController
   email_address: u.email_address,
   name: u.family&.name,
   children_name: u.family&.children&.map(&:name)&.join("、"),
-  children_class: u.family&.children&.map { |c| c.class_rooms.first&.then { |r| "#{r.grade}年#{r.section}組" } }&.join("、")
+  children_class: u.family&.children&.map { |c| c.class_rooms.map { |r| r.classname }.join("・") }&.join("、")
 } } }, status: :ok
-
     end
 
     def create_teacher
@@ -42,12 +41,14 @@ class Api::V1::AdminController < ApplicationController
         render json: {
             user: {
                 id: @user.id,
-                email_address: @user.email_address
+                email_address: @user.email_address,
+                role: @user.role
             },
             teacher: {
                 id: @teacher.id,
                 name: @teacher.name,
                 class_room: @class_room.classname
+
             }
             }, status: :created
     end
@@ -71,19 +72,20 @@ end
     {
       id: child.id,
       name: child.name,
-      class_room_id: child.class_rooms.first&.id
+      class_room_ids: child.class_rooms.map { |c|c.id }
     }
   end
   render json: { children: children }, status: :ok
 end
 
 def update_parent
+    schedule = Schedule.order(created_at: :desc).first
   user = User.find(params[:id])
   user.family.update!(name: params[:name])
   params[:children].each do |child_params|
     child = Child.find(child_params[:id])
-    child.update!(name: child_params[:name])
-    child.class_rooms = [ ClassRoom.find(child_params[:class_room_id]) ]
+    child.update!(name: child_params[:name], schedule_id: schedule&.id)
+    child.class_rooms =  ClassRoom.where(id: child_params[:class_room_ids])
   end
   render json: { message: "更新しました" }, status: :ok
 end
