@@ -6,7 +6,7 @@ module Scheduling
 
     def call
       groups = []
-      children = @schedule.children
+      children = Child.where(schedule_id: @schedule.id)
       siblings = children.group_by(&:family_id)
 
       siblings.each do |family_id, family_children|

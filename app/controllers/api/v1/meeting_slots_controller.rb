@@ -20,6 +20,19 @@ def index
   if current_user.role == "teacher"
     teacher = current_user.teacher
     slots = MeetingSlot.where(teacher: teacher)
+    if slots.empty?
+      schedule = Schedule.order(created_at: :desc).first
+      existing_slots = MeetingSlot.where(schedule_id: schedule, teacher_id: Teacher.first.id)
+      existing_slots.each do |existing_slot|
+      MeetingSlot.create!(
+        schedule: schedule,
+        teacher: teacher,
+        start_at: existing_slot.start_at,
+        end_at: existing_slot.end_at
+      )
+      end
+      slots = MeetingSlot.where(teacher: teacher)
+    end
 
     render json: slots.map { |slot|
       {
@@ -30,18 +43,16 @@ def index
         child_name: slot.assignments.first&.child&.name
       }
     }
-
   else
     family = current_user.family
     assignments = Assignment.joins(:meeting_slot, :child)
                             .where(children: { family: family })
 
     render json: assignments.map { |a|
-    class_room = a.child.child_class_rooms.first&.class_room
       {
         id: a.meeting_slot.id,
         child_name: a.child.name,
-        class_name: class_room&.classname,
+        class_name: a.meeting_slot.teacher.class_rooms.first.classname,
         start_at: a.meeting_slot.start_at,
         end_at: a.meeting_slot.end_at
         }
