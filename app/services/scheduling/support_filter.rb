@@ -18,13 +18,17 @@ module Scheduling
       normal_slots = slots.select { |s| s.teacher_id == normal_teacher_id }
       return [] if normal_slots.empty?
 
-      normal_slots.each do |normal_slot|
-        support_slot = slots.find { |s|
-          s.teacher_id == support_teacher_id &&
-          consecutive?(normal_slot, s)
-        }
-        return [ normal_slot, support_slot ] if support_slot
-      end
+normal_slots.each do |normal_slot|
+  support_slot = slots.find { |s|
+    s.teacher_id == support_teacher_id &&
+    consecutive?(normal_slot, s)
+  }
+
+  sibling_slots = slots.reject { |s|
+    s.teacher_id == normal_teacher_id || s.teacher_id == support_teacher_id
+  }
+  return [ normal_slot, support_slot ] + sibling_slots if support_slot
+end
 
       []
     end
@@ -36,7 +40,8 @@ module Scheduling
     end
 
     def consecutive?(slot1, slot2)
-      slot2.start_at == slot1.start_at + SLOT_INTERVAL_MINUTES * 60
+      slot2.start_at == slot1.start_at + SLOT_INTERVAL_MINUTES * 60 ||
+slot1.start_at == slot2.start_at + SLOT_INTERVAL_MINUTES * 60
     end
   end
 end
