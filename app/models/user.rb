@@ -3,7 +3,7 @@ class User < ApplicationRecord
     validates :email_address, presence: true, uniqueness: true
     validates :role, presence: true, inclusion: { in: %w[teacher parent admin] }
     has_one :teacher
-    has_one :family
+    has_one :family, dependent: :destroy
 
 after_create :create_role_record
 
