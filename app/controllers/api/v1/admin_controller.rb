@@ -8,7 +8,7 @@ class Api::V1::AdminController < ApplicationController
                 id: u.id,
                email_address: u.email_address,
                 name: u.teacher&.name,
-                class_room: u.teacher&.class_rooms&.first&.then { |c| "#{c.grade}年#{c.section}組" }
+                classname: u.teacher&.class_rooms&.first&.classname
             }
             },
             parents: parents.map { |u| {
@@ -86,7 +86,9 @@ def update_parent
     child = Child.find(child_params[:id])
     child.update!(name: child_params[:name], schedule_id: schedule&.id)
     child.class_rooms =  ClassRoom.where(id: child_params[:class_room_ids])
+    child.assignments.destroy_all
   end
+  Scheduling::ScheduleAssigner.new(schedule).call
   render json: { message: "更新しました" }, status: :ok
 end
 

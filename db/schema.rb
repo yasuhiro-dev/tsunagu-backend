@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_10_125412) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_22_141632) do
   create_table "assignments", force: :cascade do |t|
     t.integer "child_id", null: false
     t.datetime "created_at", null: false
     t.integer "meeting_slot_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["child_id", "meeting_slot_id"], name: "index_assignments_on_child_id_and_meeting_slot_id", unique: true
     t.index ["child_id"], name: "index_assignments_on_child_id"
     t.index ["meeting_slot_id"], name: "index_assignments_on_meeting_slot_id"
   end
@@ -125,7 +126,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_125412) do
   add_foreign_key "child_class_rooms", "class_rooms"
   add_foreign_key "children", "families"
   add_foreign_key "children", "schedules"
-  add_foreign_key "children_teachers", "children"
+  add_foreign_key "children_teachers", "children", on_delete: :cascade
   add_foreign_key "children_teachers", "teachers"
   add_foreign_key "class_rooms", "teachers"
   add_foreign_key "family_unavailabilities", "families"
