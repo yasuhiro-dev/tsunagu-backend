@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       get "/admin/parents/:id", to: "admin#show_parent"
       patch "/admin/parents/:id", to: "admin#update_parent"
       patch "/admin/teachers/:id", to: "admin#update_teacher"
+      post "/admin/parents", to: "admin#create_parent"
     end
   end
 end
