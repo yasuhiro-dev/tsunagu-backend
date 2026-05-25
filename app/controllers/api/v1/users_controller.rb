@@ -9,10 +9,8 @@ class Api::V1::UsersController < ApplicationController
         render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
         raise ActiveRecord::Rollback
       end
-
-@family = @user.family
-@family.update(name: params[:family_name])
-
+      @family = @user.family
+      @family.update(name: params[:family_name])
       children_params_list.each do |child_attrs|
         child = Child.new(name: child_attrs[:name], family_id: @family.id, schedule_id: schedule&.id)
         unless child.save
