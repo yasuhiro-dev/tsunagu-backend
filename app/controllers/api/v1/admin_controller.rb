@@ -12,13 +12,14 @@ class Api::V1::AdminController < ApplicationController
             }
             },
             parents: parents.map { |u| {
-  id: u.id,
-  email_address: u.email_address,
-  name: u.family&.name,
-  children_name: u.family&.children&.map(&:name)&.join("、"),
-  children_class: u.family&.children&.map { |c| c.class_rooms.map { |r| r.classname }.join("・") }&.join("、")
-} } }, status: :ok
-    end
+              id: u.id,
+              email_address: u.email_address,
+              name: u.family&.name,
+              name_kana: u.family&.name_kana,
+              children_name: u.family&.children&.map(&:name)&.join("、"),
+              children_class: u.family&.children&.map { |c| c.class_rooms.map { |r| r.classname }.join("・") }&.join("、")
+              } } }, status: :ok
+             end
 
     def create_teacher
         ActiveRecord::Base.transaction do
@@ -63,7 +64,7 @@ def create_parent
       raise ActiveRecord::Rollback
     end
     @family = @user.family
-    @family.update(name: params[:family_name])
+    @family.update(name: params[:family_name], name_kana: params[:name_kana])
     children_params_list.each do |child_attrs|
       child = Child.new(name: child_attrs[:name], family_id: @family.id, schedule_id: schedule.id)
       unless child.save
