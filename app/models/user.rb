@@ -2,7 +2,7 @@ class User < ApplicationRecord
     has_secure_password
     validates :email_address, presence: true, uniqueness: true
     validates :role, presence: true, inclusion: { in: %w[teacher parent admin] }
-    has_one :teacher
+    has_one :teacher, dependent: :destroy
     has_one :family, dependent: :destroy
 
 after_create :create_role_record
