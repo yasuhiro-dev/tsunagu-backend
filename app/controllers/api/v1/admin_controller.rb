@@ -80,14 +80,27 @@ def create_parent
   end
 
   return if performed?
-
   render json: {
     user: {
       id: @user.id,
       email_address: @user.email_address
     }
-  }, status: :created
-end
+    }, status: :created
+  end
+
+   def bulk_destroy
+    ids = params[:ids]
+    User.where(id: ids).destroy_all
+    render json: { message: "削除しました" }, tatus: :ok
+   end
+
+   def bulk_teacher_destroy
+    ids = params[:ids]
+    User.where(id: ids).destroy_all
+    render json: { message: "削除しました" }, status: :ok
+   end
+
+
 
 
       def destroy
