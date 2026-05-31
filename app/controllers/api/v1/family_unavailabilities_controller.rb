@@ -21,4 +21,14 @@ class Api::V1::FamilyUnavailabilitiesController < ApplicationController
             unavailabilities.destroy!
             render json: { message: "delete" }, status: :ok
         end
+
+  def update
+    family = Family.find(params[:family_id])
+    if family.submitted
+        render json: { error: "すでに提出されています" }, status: :forbidden
+    else
+       family.update(submitted: true)
+       render json: { message: "提出されました" }, status: :ok
+    end
+  end
 end
