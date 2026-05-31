@@ -21,6 +21,9 @@ Rails.application.routes.draw do
       patch "/admin/parents/:id", to: "admin#update_parent"
       patch "/admin/teachers/:id", to: "admin#update_teacher"
       post "/admin/parents", to: "admin#create_parent"
+      patch "/family_unavailabilities/:family_id", to: "family_unavailabilities#update"
+      get "child_list", to: "children#index"
+      get "/families/:id", to: "families#show"
     end
   end
 end
