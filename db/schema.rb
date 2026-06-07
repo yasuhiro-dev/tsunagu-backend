@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_30_012106) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_01_125604) do
   create_table "assignments", force: :cascade do |t|
     t.integer "child_id", null: false
     t.datetime "created_at", null: false
@@ -117,6 +117,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_30_012106) do
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address"
+    t.string "name"
     t.string "password_digest"
     t.string "role"
     t.datetime "updated_at", null: false
