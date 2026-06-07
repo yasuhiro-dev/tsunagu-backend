@@ -24,6 +24,8 @@ Rails.application.routes.draw do
       patch "/family_unavailabilities/:family_id", to: "family_unavailabilities#update"
       get "child_list", to: "children#index"
       get "/families/:id", to: "families#show"
+      get "/children/unassigned", to: "children#unassigned"
+      post "/assignments", to: "assignments#create"
     end
   end
 end
