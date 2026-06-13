@@ -27,14 +27,19 @@ class Api::V1::UsersController < ApplicationController
 
     return if performed?
 
-    render json: {
-      token: encode_token({ user_id: @user.id }),
-      user: {
-        id: @user.id,
-        email_address: @user.email_address
-      }
-    }, status: :created
-  end
+  render json: {
+  token: encode_token({
+    user_id: @user.id,
+    role: @user.role,
+    family_id: @family.id,
+    name: @family.name
+  }),
+  user: {
+    id: @user.id,
+    email_address: @user.email_address
+  }
+}, status: :created
+end
 
   private
 
