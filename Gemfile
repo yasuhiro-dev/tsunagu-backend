@@ -54,7 +54,6 @@ group :development, :test do
   gem "pry-byebug"
   gem "pry-doc"
   gem "pry-rails"
-  # テストフレームワーク rspec を導入する
   gem "rspec-rails"
 end
 group :development, :test do
