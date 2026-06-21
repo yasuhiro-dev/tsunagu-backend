@@ -15,4 +15,4 @@ test:
   <<: *default
 
 production:
-  <<: *default
+  adapter: async
