@@ -1,7 +1,7 @@
 module Authentication
   extend ActiveSupport::Concern
 
-  SECRET_KEY = Rails.application.credentials.secret_key_base
+  SECRET_KEY = Rails.application.credentials.secret_key_base || ENV["SECRET_KEY_BASE"]
 
   def encode_token(payload)
     JWT.encode(payload, SECRET_KEY, "HS256")
