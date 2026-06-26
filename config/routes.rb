@@ -27,6 +27,8 @@ Rails.application.routes.draw do
       get "/families/:id", to: "families#show"
       get "/children/unassigned", to: "children#unassigned"
       post "/assignments", to: "assignments#create"
+      post "/password_resets", to: "password_resets#create"
+      patch "/password_resets/:token", to: "password_resets#update"
     end
   end
 end

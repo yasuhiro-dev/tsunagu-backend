@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_19_110954) do
-  execute("SET FOREIGN_KEY_CHECKS=0") if ActiveRecord::Base.connection.adapter_name == "Mysql2"
+ActiveRecord::Schema[8.1].define(version: 2026_06_25_123031) do
   create_table "assignments", force: :cascade do |t|
     t.bigint "child_id"
     t.datetime "created_at", null: false
@@ -56,7 +55,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_110954) do
     t.integer "grade"
     t.integer "room_type"
     t.integer "section"
-    t.bigint "teacher_id"
+    t.integer "teacher_id"
     t.datetime "updated_at", null: false
     t.index ["teacher_id"], name: "index_class_rooms_on_teacher_id"
   end
@@ -67,7 +66,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_110954) do
     t.string "name_kana"
     t.boolean "submitted"
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
+    t.integer "user_id"
   end
 
   create_table "family_unavailabilities", force: :cascade do |t|
@@ -82,10 +81,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_110954) do
   create_table "meeting_slots", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "end_at"
-    t.bigint "schedule_id"
+    t.integer "schedule_id"
     t.datetime "start_at"
     t.integer "status"
-    t.bigint "teacher_id", null: false
+    t.integer "teacher_id", null: false
     t.datetime "updated_at", null: false
     t.index ["schedule_id"], name: "index_meeting_slots_on_schedule_id"
     t.index ["teacher_id"], name: "index_meeting_slots_on_teacher_id"
@@ -103,7 +102,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_110954) do
     t.string "ip_address"
     t.datetime "updated_at", null: false
     t.string "user_agent"
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
@@ -112,7 +111,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_110954) do
     t.string "name"
     t.integer "role"
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
+    t.integer "user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -120,6 +119,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_110954) do
     t.string "email_address"
     t.string "name"
     t.string "password_digest"
+    t.string "reset_digest"
+    t.datetime "reset_sent_at"
     t.string "role"
     t.datetime "updated_at", null: false
   end
@@ -138,6 +139,4 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_110954) do
   add_foreign_key "meeting_slots", "schedules"
   add_foreign_key "meeting_slots", "teachers"
   add_foreign_key "sessions", "users"
-
-  execute("SET FOREIGN_KEY_CHECKS=1") if ActiveRecord::Base.connection.adapter_name == "Mysql2"
 end
