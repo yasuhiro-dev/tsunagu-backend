@@ -24,7 +24,7 @@ after_create :create_role_record
   end
 
   def send_password_reset_email
-    UserMailer.with(user: self).password_reset.deliver_later
+    UserMailer.with(user: self).password_reset.deliver_now
   end
 
 private
