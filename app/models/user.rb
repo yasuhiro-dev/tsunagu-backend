@@ -15,10 +15,6 @@ class User < ApplicationRecord
                                                   BCrypt::Engine.cost
     BCrypt::Password.create(string, cost: cost)
     end
-
-
-
-
 after_create :create_role_record
 
   def create_reset_digest
