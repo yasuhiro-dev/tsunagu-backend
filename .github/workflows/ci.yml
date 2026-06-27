@@ -110,6 +110,6 @@ jobs:
           aws ecs update-service \
             --cluster tsunagu-cluster \
             --service tsunagu-backend-service \
-            --task-definition tsunagu-backend-task:4 \
+            --task-definition tsunagu-backend-task:6 \
             --enable-execute-command \
             --force-new-deployment
