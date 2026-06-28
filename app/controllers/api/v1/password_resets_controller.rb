@@ -12,7 +12,7 @@ class Api::V1::PasswordResetsController < ApplicationController
   end
 
   def update
-      @user = User.find_by(email_address: params[:email])
+      @user = User.find_by(reset_digest: User.digest(params[:token]))
     if @user && @user.authenticated?(:reset, params[:token])
          if params[:user][:password].empty?
            render json: { message: "パスワードの再設定に失敗しました" }, status: :unprocessable_entity
