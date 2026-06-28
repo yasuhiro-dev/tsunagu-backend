@@ -5,6 +5,12 @@ class User < ApplicationRecord
     validates :role, presence: true, inclusion: { in: %w[teacher parent admin] }
     has_one :teacher, dependent: :destroy
     has_one :family, dependent: :destroy
+    
+def authenticated?(attribute, token)
+  digest = send("#{attribute}_digest")
+  return false if digest.nil?
+  BCrypt::Password.new(digest).is_password?(token)
+end
 
     def User.new_token
     SecureRandom.urlsafe_base64
