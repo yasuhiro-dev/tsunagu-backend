@@ -1,7 +1,9 @@
 class Api::V1::ChildrenController<ApplicationController
     def index
         teacher = current_user.teacher
-        children = Child.includes(:family).where(class_room_id: teacher.class_room_ids)
+        children = Child.includes(:family)
+        .joins(:child_class_rooms)
+        .where(child_class_rooms: { class_room_id: teacher.class_room_ids })
         render json: children.map { |c| {
             id: c.id,
             child_name: c.name,
