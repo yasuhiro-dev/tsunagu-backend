@@ -3,7 +3,7 @@ class Api::V1::ChildrenController<ApplicationController
         teacher = current_user.teacher
         children = Child.includes(:family)
         .joins(:child_class_rooms)
-        .where(child_class_rooms: { class_room_id: teacher.class_room_ids})
+        .where(child_class_rooms: { class_room_id: teacher.class_room_ids })
         render json: children.map { |c| {
             id: c.id,
             child_name: c.name,
