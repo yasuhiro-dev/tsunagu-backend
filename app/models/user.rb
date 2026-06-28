@@ -1,8 +1,10 @@
 class User < ApplicationRecord
     has_secure_password
     attr_accessor :reset_token
-    validates :email_address, presence: true, uniqueness: true
+    validates :email_address, presence: true, uniqueness: true,
+              format: { with: URI::MailTo::EMAIL_REGEXP }
     validates :role, presence: true, inclusion: { in: %w[teacher parent admin] }
+    validates :password, length: { minimum: 8 }, if: :password_digest_changed?
     has_one :teacher, dependent: :destroy
     has_one :family, dependent: :destroy
 
