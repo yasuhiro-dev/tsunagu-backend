@@ -6,7 +6,7 @@ class Api::V1::SessionsController < ApplicationController
             token = encode_token({ user_id: user.id, role: user.role, family_id: user.family&.id, name: name })
             render json: { token: token, role: user.role }, status: :ok
         else
-            render json { error :"Invalid email or password" }, status: :unauthorized
+            render json: { error: "Invalid email or password" }, status: :unauthorized
         end
     end
 end
