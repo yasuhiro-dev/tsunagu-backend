@@ -4,7 +4,7 @@ class User < ApplicationRecord
     validates :email_address, presence: true, uniqueness: true,
               format: { with: URI::MailTo::EMAIL_REGEXP }
     validates :role, presence: true, inclusion: { in: %w[teacher parent admin] }
-    validates :password, length: { minimum: 8 }, if: :password_digest_changed?
+    validates :password, presence: true, length: { minimum: 8 }, if: :password_digest_changed?
     has_one :teacher, dependent: :destroy
     has_one :family, dependent: :destroy
 
