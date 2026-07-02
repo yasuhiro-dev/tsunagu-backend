@@ -1,5 +1,6 @@
 class User < ApplicationRecord
     has_secure_password
+    attr_accessor :role_name
     attr_accessor :reset_token
     validates :email_address, presence: true, uniqueness: true,
               format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -41,7 +42,7 @@ def create_role_record
     if role == "teacher"
         Teacher.create!(user: self)
     elsif role == "parent"
-        Family.create!(user: self)
+        Family.create!(user: self, name: role_name)
     end
 end
 end
