@@ -8,23 +8,23 @@ User.find_or_create_by!(email_address: "admin@example.com") do |u|
 end
 
 classes = [
-  [ 1, 1, "青木", "1年1組", :normal ],
-  [ 1, 2, "石川", "1年2組", :normal ],
-  [ 2, 1, "上田", "2年1組", :normal ],
-  [ 2, 2, "遠藤", "2年2組", :normal ],
-  [ 3, 1, "岡田", "3年1組", :normal ],
-  [ 3, 2, "加藤", "3年2組", :normal ],
-  [ 4, 1, "木村", "4年1組", :normal ],
-  [ 4, 2, "小林", "4年2組", :normal ],
-  [ 5, 1, "斎藤", "5年1組", :normal ],
-  [ 5, 2, "佐々木", "5年2組", :normal ],
-  [ 6, 1, "田中", "6年1組", :normal ],
-  [ 6, 2, "中村", "6年2組", :normal ],
-  [ 0, 1, "林", "ひまわり", :support ]
+  [ 1, 1, "青木", "aoki", "1年1組", :normal ],
+  [ 1, 2, "石川", "ishikawa", "1年2組", :normal ],
+  [ 2, 1, "上田", "ueda", "2年1組", :normal ],
+  [ 2, 2, "遠藤", "endo", "2年2組", :normal ],
+  [ 3, 1, "岡田", "okada", "3年1組", :normal ],
+  [ 3, 2, "加藤", "kato_t", "3年2組", :normal ],
+  [ 4, 1, "木村", "kimura", "4年1組", :normal ],
+  [ 4, 2, "小林", "kobayashi_t", "4年2組", :normal ],
+  [ 5, 1, "斎藤", "saito", "5年1組", :normal ],
+  [ 5, 2, "佐々木", "sasaki", "5年2組", :normal ],
+  [ 6, 1, "田中", "tanaka_t", "6年1組", :normal ],
+  [ 6, 2, "中村", "nakamura_t", "6年2組", :normal ],
+  [ 0, 1, "林", "hayashi", "ひまわり", :support ]
 ]
 
-classes.each do |grade, section, teacher_name, class_name, room_type|
-  user = User.find_or_create_by!(email_address: "#{teacher_name}@example.com") do |u|
+classes.each do |grade, section, teacher_name, teacher_email_local, class_name, room_type|
+  user = User.find_or_create_by!(email_address: "#{teacher_email_local}@example.com") do |u|
     u.password = "password"
     u.role = "teacher"
   end
@@ -58,8 +58,8 @@ families.each do |f|
   user = User.find_or_create_by!(email_address: f[:email]) do |u|
     u.password = "password"
     u.role = "parent"
+    u.role_name = f[:name]
   end
-  user.family.update!(name: f[:name])
 end
 
 child=[
