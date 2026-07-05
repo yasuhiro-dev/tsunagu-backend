@@ -1,7 +1,7 @@
 class Api::V1::AdminController < ApplicationController
     def index
         teachers = User.where(role: "teacher").includes(teacher: { class_rooms: [] })
-        parents = User.where(role: "parent").includes(family: { children: [] })
+        parents = User.where(role: "parent").includes(family: { children: :class_rooms })
 
         render json: {
             teachers: teachers.map { |u|{
@@ -91,7 +91,7 @@ def create_parent
    def bulk_destroy
     ids = params[:ids]
     User.where(id: ids).destroy_all
-    render json: { message: "削除しました" }, tatus: :ok
+    render json: { message: "削除しました" }, status: :ok
    end
 
    def bulk_teacher_destroy
@@ -119,7 +119,7 @@ end
 
        def show_parent
   user = User.find(params[:id])
-  children = user.family.children.map do |child|
+  children = user.family.children.includes(:class_rooms).map do |child|
     {
       id: child.id,
       name: child.name,
