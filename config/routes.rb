@@ -29,6 +29,7 @@ Rails.application.routes.draw do
       post "/assignments", to: "assignments#create"
       post "/password_resets", to: "password_resets#create"
       patch "/password_resets/:token", to: "password_resets#update"
+      get "/assignment_stats", to: "assignment_stats#index"
     end
   end
 end
