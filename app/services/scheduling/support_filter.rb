@@ -9,14 +9,14 @@ module Scheduling
       support_teacher_id = support_entry[:child].class_rooms
                                                 .where(room_type: "support")
                                                 .first&.teacher_id
-      return [] if support_teacher_id.nil?
+      return slots if support_teacher_id.nil?
 
       normal_teacher_id = support_entry[:child].class_rooms
                                                .where(room_type: "normal")
                                                .first&.teacher_id
 
       normal_slots = slots.select { |s| s.teacher_id == normal_teacher_id }
-      return [] if normal_slots.empty?
+      return slots if normal_slots.empty?
 
 normal_slots.each do |normal_slot|
   support_slot = slots.find { |s|
