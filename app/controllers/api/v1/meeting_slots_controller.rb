@@ -1,5 +1,6 @@
 class Api::V1::MeetingSlotsController < ApplicationController
-    before_action :authenticate_user!
+  before_action -> { authorize_role!("teacher", "parent") }, only: [ :index ]
+  before_action -> { authorize_role!("parent") }, only: [ :all ]
     def all
  family = current_user.family
   teacher_ids = family.children.flat_map { |child| child.class_rooms.map(&:teacher_id) }

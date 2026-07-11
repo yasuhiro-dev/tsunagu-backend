@@ -4,6 +4,7 @@ module Authentication
   SECRET_KEY = Rails.application.credentials.secret_key_base || ENV["SECRET_KEY_BASE"]
 
   def encode_token(payload)
+    payload[:exp] = (Time.now + 30.minutes).to_i
     JWT.encode(payload, SECRET_KEY, "HS256")
   end
 
@@ -22,5 +23,9 @@ module Authentication
 
   def authenticate_user!
     render json: { error: "Unauthorized" }, status: :unauthorized unless current_user
+  end
+
+  def authorize_role!(*roles)
+    render json: { error: "Unauthorized" }, status: :unauthorized unless current_user && roles.include?(current_user.role)
   end
 end

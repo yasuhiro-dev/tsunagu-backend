@@ -1,4 +1,5 @@
 class Api::V1::ChildrenController<ApplicationController
+    before_action -> { authorize_role!("teacher", "admin") }
     def index
         teacher = current_user.teacher
         children = Child.includes(:family, :assignments)

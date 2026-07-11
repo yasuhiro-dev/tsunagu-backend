@@ -1,4 +1,5 @@
 class Api::V1::AssignmentStatsController < ApplicationController
+    before_action -> { authorize_role!("admin") }
     def index
         # クラス別の人数
         total=Child.joins(:class_rooms).group("class_rooms.grade", "class_rooms.section").count
