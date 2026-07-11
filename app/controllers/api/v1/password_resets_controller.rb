@@ -1,11 +1,11 @@
 class Api::V1::PasswordResetsController < ApplicationController
+  skip_before_action :authenticate_user!, only: [ :create, :update ]
   def create
     @user = User.find_by(email_address: params[:password_reset][:email].downcase)
     if @user
       @user.create_reset_digest
       @user.send_password_reset_email
       render json: { message: "メールを送信しました" }, status: :ok
-
     else
       render json: { message: "メール送信に失敗しました" }, status: :not_found
     end

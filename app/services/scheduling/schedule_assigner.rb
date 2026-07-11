@@ -8,7 +8,6 @@ module Scheduling
     groups = GroupChildren.new(@schedule).call
     sorted_groups = PrioritySort.new.call(groups)
     sorted_groups.each do |group|
-      puts "=== group: #{group.map { |g| g[:child].name }} ==="
         slots = AvailableSlots.new(@schedule).call(group)
         slots = TimeFilter.new.call(slots, group)
         slots = SiblingsFilter.new.call(slots, group)

@@ -2,5 +2,6 @@
 FactoryBot.define do
   factory :family do
     name { "テスト家族" }
+    user
   end
 end
