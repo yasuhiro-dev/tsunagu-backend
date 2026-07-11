@@ -1,9 +1,11 @@
 class Api::V1::UsersController < ApplicationController
+  skip_before_action :authenticate_user!, only: [ :create_parent ]
   def create_parent
     schedule = Schedule.order(created_at: :desc).first
     ActiveRecord::Base.transaction do
       @user = User.new(parent_params)
       @user.role = "parent"
+      @user.role_name = params[:family_name]
 
       unless @user.save
         render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
