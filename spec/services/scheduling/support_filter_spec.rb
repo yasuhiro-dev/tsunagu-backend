@@ -54,7 +54,7 @@ RSpec.describe Scheduling::SupportFilter do
         let(:group) { [ { child: child_b1, type: :support } ] }
         let(:schedule) { create(:schedule) }
         let(:normal_slot) { create(:meeting_slot, teacher: teacher_a, schedule: schedule) }
-        let(:support_slot) { create(:meeting_slot, teacher: teacher_b, schedule: schedule) }
+        let(:support_slot) { create(:meeting_slot, teacher: teacher_b, schedule: schedule, start_at: normal_slot.start_at + 15.minutes) }
         let(:slots) { [ normal_slot, support_slot ] }
 
         subject { Scheduling::SupportFilter.new.call(slots, group) }

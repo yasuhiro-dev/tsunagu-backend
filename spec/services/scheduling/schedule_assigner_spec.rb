@@ -23,6 +23,8 @@ RSpec.describe Scheduling::ScheduleAssigner do
     context "slotsが空の場合" do
         before do
             allow(Scheduling::TimeFilter).to receive_message_chain(:new, :call).and_return([])
+            allow(Scheduling::SiblingsFilter).to receive_message_chain(:new, :call).and_return([])
+            allow(Scheduling::SupportFilter).to receive_message_chain(:new, :call).and_return([])
         end
         it "Assignerを呼び出さない" do
            assigner.call
