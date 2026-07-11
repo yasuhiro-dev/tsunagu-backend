@@ -1,4 +1,5 @@
 class Api::V1::SchedulesController < ApplicationController
+    before_action -> { authorize_role!("admin", "teacher") }
     def create
         schedule = Schedule.find(params[:id])
         schedule.meeting_slots.update_all(status: :available)

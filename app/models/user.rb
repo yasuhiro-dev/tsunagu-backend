@@ -25,6 +25,7 @@ end
     BCrypt::Password.create(string, cost: cost)
     end
 after_create :create_role_record
+
   def create_reset_digest
   self.reset_token = User.new_token
   update(

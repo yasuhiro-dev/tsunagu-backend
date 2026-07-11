@@ -1,6 +1,7 @@
 module Api
   module V1
     class AssignmentsController < ApplicationController
+      before_action -> { authorize_role!("admin", "teacher") }
         def create
           assignment = Assignment.new(
             meeting_slot_id: params[:meeting_slot_id],
