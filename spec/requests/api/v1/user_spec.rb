@@ -11,7 +11,11 @@ RSpec.describe "Api::V1::UsersParent", type: :request do
       { name: "test",
     class_room_id: class_room.id }
     ]
-    }) }
-    it_behaves_like "成功する", :created
+    }, headers: headers) }
+
+    context "未ログイン" do
+      let(:headers) { {} }
+      it_behaves_like "未ログインだと200が返る"
+    end
   end
 end
