@@ -63,6 +63,7 @@ class Api::V1::AdminController < ApplicationController
       schedule = Schedule.last
       @user = User.new(parent_params)
       @user.role = "parent"
+      @user.role_name = params[:family_name]
       unless @user.save
         render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
         raise ActiveRecord::Rollback
@@ -111,6 +112,20 @@ class Api::V1::AdminController < ApplicationController
     render json: { message: "削除しました" }, status: :ok
   end
 
+  def update_parent
+    schedule = Schedule.order(created_at: :desc).first
+    user = User.find(params[:id])
+    user.family.update!(name: params[:name])
+    params[:children].each do |child_params|
+      child = Child.find(child_params[:id])
+      child.update!(name: child_params[:name], schedule_id: schedule&.id)
+      child.class_rooms = ClassRoom.where(id: child_params[:class_room_ids])
+      child.assignments.destroy_all
+    end
+    Scheduling::ScheduleAssigner.new(schedule).call
+    render json: { message: "更新しました" }, status: :ok
+  end
+
   def update_teacher
     teacher = User.find(params[:id]).teacher
     teacher.update!(name: params[:name])
@@ -131,19 +146,7 @@ class Api::V1::AdminController < ApplicationController
     render json: { children: children }, status: :ok
   end
 
-  def update_parent
-    schedule = Schedule.order(created_at: :desc).first
-    user = User.find(params[:id])
-    user.family.update!(name: params[:name])
-    params[:children].each do |child_params|
-      child = Child.find(child_params[:id])
-      child.update!(name: child_params[:name], schedule_id: schedule&.id)
-      child.class_rooms = ClassRoom.where(id: child_params[:class_room_ids])
-      child.assignments.destroy_all
-    end
-    Scheduling::ScheduleAssigner.new(schedule).call
-    render json: { message: "更新しました" }, status: :ok
-  end
+
 
   private
 
