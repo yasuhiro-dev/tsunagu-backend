@@ -13,12 +13,13 @@ RSpec.describe "Api::V1::Assignments", type: :request do
 
     context "adminでログインしている場合" do
       let(:admin_user) { create(:user, role: "admin") }
-      let(:headers) { auth_headers_for(admin_user)  }
+      let(:headers) { auth_headers_for(admin_user) }
        it "200が返り、割り当てされたデータが含まれる" do
         subject
+        puts response.body
         expect(response).to have_http_status(:created)
         res = JSON.parse(response.body)
-        expect(res.keys).to include("scheduleid")
+        expect(res.keys).to include("meeting_slot_id", "child_id")
        end
       end
 

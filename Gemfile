@@ -62,4 +62,4 @@ end
 
 gem "jwt"
 
-gem "mysql2", group: :production
+gem "mysql2"
