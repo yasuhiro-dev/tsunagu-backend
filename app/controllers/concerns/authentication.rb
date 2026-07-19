@@ -3,9 +3,9 @@ module Authentication
 
   SECRET_KEY = Rails.application.credentials.secret_key_base || ENV["SECRET_KEY_BASE"]
 
-  def encode_token(payload)
-    payload[:exp] = (Time.now + 30.minutes).to_i
-    JWT.encode(payload, SECRET_KEY, "HS256")
+  def encode_token(payload, expires_in: 30.minutes)
+  payload[:exp] = expires_in.from_now.to_i
+  JWT.encode(payload, SECRET_KEY, "HS256")
   end
 
   def decode_token(token)
