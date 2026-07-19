@@ -10,8 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_17_223224) do
-  create_table "assignments", force: :cascade do |t|
+ActiveRecord::Schema[8.1].define(version: 2026_07_18_050318) do
+  create_table "assignments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "child_id"
     t.datetime "created_at", null: false
     t.bigint "meeting_slot_id"
@@ -21,7 +21,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_223224) do
     t.index ["meeting_slot_id"], name: "index_assignments_on_meeting_slot_id"
   end
 
-  create_table "child_class_rooms", force: :cascade do |t|
+  create_table "child_class_rooms", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "child_id"
     t.bigint "class_room_id"
     t.datetime "created_at", null: false
@@ -30,7 +30,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_223224) do
     t.index ["class_room_id"], name: "index_child_class_rooms_on_class_room_id"
   end
 
-  create_table "children", force: :cascade do |t|
+  create_table "children", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "family_id"
     t.string "name"
@@ -40,7 +40,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_223224) do
     t.index ["schedule_id"], name: "index_children_on_schedule_id"
   end
 
-  create_table "children_teachers", force: :cascade do |t|
+  create_table "children_teachers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "child_id"
     t.datetime "created_at", null: false
     t.bigint "teacher_id"
@@ -49,7 +49,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_223224) do
     t.index ["teacher_id"], name: "index_children_teachers_on_teacher_id"
   end
 
-  create_table "class_rooms", force: :cascade do |t|
+  create_table "class_rooms", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "classname"
     t.datetime "created_at", null: false
     t.integer "grade"
@@ -60,7 +60,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_223224) do
     t.index ["teacher_id"], name: "index_class_rooms_on_teacher_id"
   end
 
-  create_table "families", force: :cascade do |t|
+  create_table "families", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
     t.string "name_kana"
@@ -69,7 +69,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_223224) do
     t.bigint "user_id"
   end
 
-  create_table "family_unavailabilities", force: :cascade do |t|
+  create_table "family_unavailabilities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "family_id"
     t.bigint "meeting_slot_id"
@@ -78,7 +78,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_223224) do
     t.index ["meeting_slot_id"], name: "index_family_unavailabilities_on_meeting_slot_id"
   end
 
-  create_table "meeting_slots", force: :cascade do |t|
+  create_table "meeting_slots", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "end_at"
     t.bigint "schedule_id"
@@ -90,14 +90,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_223224) do
     t.index ["teacher_id"], name: "index_meeting_slots_on_teacher_id"
   end
 
-  create_table "schedules", force: :cascade do |t|
+  create_table "schedules", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
     t.datetime "updated_at", null: false
     t.integer "year"
   end
 
-  create_table "sessions", force: :cascade do |t|
+  create_table "sessions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
     t.datetime "updated_at", null: false
@@ -106,7 +106,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_223224) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
-  create_table "teachers", force: :cascade do |t|
+  create_table "teachers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
     t.integer "role"
@@ -114,9 +114,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_223224) do
     t.bigint "user_id"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address"
+    t.text "google_access_token"
+    t.text "google_refresh_token"
+    t.datetime "google_token_expires_at"
     t.string "name"
     t.string "password_digest"
     t.string "reset_digest"

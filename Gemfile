@@ -63,3 +63,5 @@ end
 gem "jwt"
 
 gem "mysql2"
+
+gem "oauth2"
