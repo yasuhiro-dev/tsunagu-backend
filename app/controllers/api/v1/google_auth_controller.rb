@@ -41,15 +41,9 @@ class Api::V1::GoogleAuthController < ApplicationController
 
    private
 
-  def google_client
-    OAuth2::Client.new(
-      Rails.application.credentials.google[:client_id],
-      Rails.application.credentials.google[:client_secret],
-      site: "https://accounts.google.com",
-      authorize_url: "/o/oauth2/auth",
-      token_url: "/o/oauth2/token"
-    )
-  end
+   def google_client
+    GoogleOauthClient.build
+   end
 
   def callback_url
     "http://localhost:3000/api/v1/google_auth/callback"
