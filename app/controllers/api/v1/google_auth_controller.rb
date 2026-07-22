@@ -1,16 +1,17 @@
 class Api::V1::GoogleAuthController < ApplicationController
-    before_action :authenticate_user!, only: [ :connect ]
+    before_action :authenticate_user!, only: [ :connect, :status ]
 
     def connect
         state = encode_token({ user_id: current_user.id }, expires_in: 5.minutes)
 
-        redirect_to google_client.auth_code.authorize_url(
+        url = google_client.auth_code.authorize_url(
             redirect_uri: callback_url,
             scope: "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/calendar.events",
             state: state,
             access_type: "offline",
             prompt: "consent"
-        ), allow_other_host: true
+        )
+        render json: { url: url }
     end
 
     def callback
@@ -37,6 +38,10 @@ class Api::V1::GoogleAuthController < ApplicationController
     )
 
     redirect_to "http://localhost:3001/settings?google_connected=true"
+  end
+
+  def status
+    render json: { connected: current_user.google_access_token.present? }, status: :ok
   end
 
    private

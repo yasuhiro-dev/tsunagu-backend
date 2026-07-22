@@ -26,16 +26,6 @@ module Api
             rescue => e
           Rails.logger.error("メール送信に失敗しました: #{e.message}")
         end
-        def register_confirmation_event(assignment)
-          parent_user = assignment.child.family.user
-          CalenderService.new(parent_user).register_calendar(
-            summary: "面談日",
-            start_at: assignment.meeting_slot.start_at,
-            end_at: assignment.meeting_slot.end_at
-          )
-          rescue => e
-            Rails.logger.error("カレンダー登録に失敗しました: #{e.message}")
-        end
     end
   end
 end
