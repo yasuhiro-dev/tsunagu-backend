@@ -1,4 +1,4 @@
-class CalenderService
+class GoogleCalendarService
 CALENDER_URL="https://www.googleapis.com/calendar/v3/calendars/primary/events"
 
   def initialize(user)

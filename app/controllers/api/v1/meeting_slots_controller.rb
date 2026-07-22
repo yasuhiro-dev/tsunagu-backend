@@ -53,12 +53,11 @@ class Api::V1::MeetingSlotsController < ApplicationController
     else
       family = current_user.family
       assignments = Assignment.joins(:meeting_slot, :child)
-                               .where(children: { family: family })
-                               .includes(:child, meeting_slot: { teacher: :class_rooms })
-
+                              .where(children: { family: family })
+                              .includes(:child, meeting_slot: { teacher: :class_rooms })
       render json: assignments.map { |a|
         {
-          id: a.meeting_slot.id,
+          id: a.id,
           child_name: a.child.name,
           class_name: a.meeting_slot.teacher.class_rooms.first.classname,
           start_at: a.meeting_slot.start_at,
