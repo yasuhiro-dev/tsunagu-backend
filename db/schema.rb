@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_18_050318) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_25_131112) do
   create_table "assignments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "child_id"
     t.datetime "created_at", null: false
@@ -34,6 +34,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_050318) do
     t.datetime "created_at", null: false
     t.bigint "family_id"
     t.string "name"
+    t.string "name_kana"
     t.bigint "schedule_id"
     t.datetime "updated_at", null: false
     t.index ["family_id"], name: "index_children_on_family_id"

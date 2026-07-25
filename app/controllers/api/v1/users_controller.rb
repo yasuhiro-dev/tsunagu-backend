@@ -6,13 +6,13 @@ class Api::V1::UsersController < ApplicationController
       @user = User.new(parent_params)
       @user.role = "parent"
       @user.role_name = params[:family_name]
+      @user.role_name_kana = params[:family_name_kana]
 
       unless @user.save
         render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
         raise ActiveRecord::Rollback
       end
       @family = @user.family
-      @family.update(name: params[:family_name])
       children_params_list.each do |child_attrs|
         child = Child.new(name: child_attrs[:name], family_id: @family.id, schedule_id: schedule&.id)
         unless child.save

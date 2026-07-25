@@ -1,6 +1,10 @@
+Faker::Config.locale = 'ja'
+
 schedule = Schedule.find_or_create_by!(
   name: "2026年個別面談",
   year: 2026)
+
+  
 
 User.find_or_create_by!(email_address: "admin@example.com") do |u|
   u.password="password"
@@ -38,62 +42,79 @@ classes.each do |grade, section, teacher_name, teacher_email_local, class_name, 
   end
 end
 
-families = [
-  { name: "山田健一", email: "yamada@example.com" },
-  { name: "田中誠", email: "tanaka@example.com" },
-  { name: "鈴木博", email: "suzuki@example.com" },
-  { name: "佐藤陽子", email: "sato@example.com" },
-  { name: "高橋恵子", email: "takahashi@example.com" },
-  { name: "伊藤真一", email: "ito@example.com" },
-  { name: "渡辺久美", email: "watanabe@example.com" },
-  { name: "中村和夫", email: "nakamura@example.com" },
-  { name: "小林洋子", email: "kobayashi@example.com" },
-  { name: "加藤浩二", email: "kato@example.com" },
-  { name: "吉田明美", email: "yoshida@example.com" },
-  { name: "山口剛", email: "yamaguchi@example.com" },
-  { name: "松本幸子", email: "matsumoto@example.com" }
-]
-
-families.each do |f|
-  user = User.find_or_create_by!(email_address: f[:email]) do |u|
-    u.password = "password"
-    u.role = "parent"
-    u.role_name = f[:name]
+normal_classes = classes.select{|c|c[5] != :support}
+classes.each do |grade, section, teacher_name, teacher_email_local, class_name, room_type|
+  target_count= room_type == :support ? 10 : 20
+  current_count = 0
+  while current_count < target_count
+    gimei_last_name = Gimei.last
+    gimei_first_name = Gimei.first
+    # １人目の苗字名前
+    family_last_name = gimei_last_name.kanji
+    family_last_name_kana = gimei_last_name.hiragana
+    role_name = family_last_name
+    role_name_kana = family_last_name_kana
+    # Userテーブルに家族の苗字の情報が入る
+    parent_user = User.create!(
+      email_address:Faker::Internet.unique.email,
+      password: "password",
+      role:"parent",
+      role_name:role_name,
+      role_name_kana:role_name_kana
+      )
+    
+    family = parent_user.family 
+    # １人目の苗字＋名前
+    family_full_name = family_last_name + gimei_first_name.kanji
+    family_full_name_kana = family_last_name_kana + gimei_first_name.hiragana
+    # Childテーブルに名前と家族情報を入れる
+    first_child = Child.find_or_create_by!(name: family_full_name, family: family,name_kana:family_full_name_kana)
+    # クラス情報を入れる
+      class_room = ClassRoom.find_by!(
+        grade: grade,   
+        section: section
+        )
+    # 子供とクラスの情報を繋げる
+      ChildClassRoom.find_or_create_by!(
+        child: first_child,
+        class_room: class_room
+        ) 
+    current_count += 1
+    # ３０％の確率で処理を行う
+    if rand < 0.3
+    # 兄弟の下の名前を生成する
+      gimei_siblings_first_name = Gimei.first
+    # 兄弟の苗字＋名前
+      siblings_full_name = family_last_name + gimei_siblings_first_name.kanji
+      siblings_full_name_kana = family_last_name_kana + gimei_siblings_first_name.hiragana
+    # Childテーブルにfamily情報を繋げる
+      sibling_child =Child.find_or_create_by!(name:siblings_full_name, family: family ,name_kana:siblings_full_name_kana)
+      classes_sample = normal_classes.sample
+      siblings_class_room = ClassRoom.find_by!(
+        grade:classes_sample[0],
+        section:classes_sample[1]
+      )
+      ChildClassRoom.find_or_create_by!(
+        child: sibling_child,
+        class_room: siblings_class_room
+        )
+    end
+    # 特別支援の子供の場合、通常学級のクラスも割り当てる
+    if room_type == :support
+      sample_classes = normal_classes.sample
+      support_class_room = ClassRoom.find_by!(
+        grade: sample_classes[0],
+        section: sample_classes[1]
+      )
+      ChildClassRoom.find_or_create_by!(
+        child: first_child,
+        class_room: support_class_room
+        )
+    end
   end
 end
 
-child=[
-    [ "山田太郎", "山田健一", 5, 1 ], [ "田中花子", "田中誠", 5, 1 ], [ "鈴木一郎", "鈴木博", 5, 1 ], [ "佐藤美咲", "佐藤陽子", 5, 1 ],
-    [ "高橋健太", "高橋恵子", 5, 1 ], [ "伊藤さくら", "伊藤真一", 5, 1 ], [ "渡辺拓也", "渡辺久美", 5, 1 ], [ "中村彩", "中村和夫", 5, 1 ],
-    [ "小林大輝", "小林洋子", 5, 1 ], [ "加藤愛", "加藤浩二", 5, 1 ], [ "吉田翔", "吉田明美", 5, 2 ], [ "山口葵", "山口剛", 0, 1 ],
-    [ "松本蓮", "松本幸子", 6, 2 ], [ "鈴木陽子", "鈴木博", 6, 1 ]
-]
 
-child.each do |child_name, family_name, grade, section|
-    family = Family.find_by!(name: family_name)
-
-    class_room= ClassRoom.find_by!(
-         grade: grade,
-         section: section
-    )
-
-  child = Child.find_or_create_by!(name: child_name) do |c|
-    c.family = family
-    c.schedule = schedule
-  end
-
-  ChildClassRoom.find_or_create_by!(
-    child: child,
-    class_room: class_room
-  )
-end
-
-child_miro = Child.find_by!(name: "山口葵")
-normal_class = ClassRoom.find_by!(grade: 5, section: 1)
-ChildClassRoom.find_or_create_by!(
-  child: child_miro,
-  class_room: normal_class
-)
 
 teachers = Teacher.all
 start_date = Date.parse("2026-06-01")
@@ -118,9 +139,12 @@ teachers.each do |teacher|
   end
 end
 
+
 Child.all.each do |child|
-    slot = MeetingSlot.available.first
-    break if slot.nil?
+  child_room_type = child.child_class_rooms.find{|c|c.class_room.room_type == "normal"}
+  child_teacher = child_room_type.class_room.teacher
+  slot = MeetingSlot.where(teacher:child_teacher).available.first
+    next if slot.nil?
     Assignment.find_or_create_by!(
         child: child,
         meeting_slot: slot
