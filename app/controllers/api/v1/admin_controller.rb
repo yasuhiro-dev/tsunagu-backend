@@ -11,6 +11,7 @@ class Api::V1::AdminController < ApplicationController
           id: u.id,
           email_address: u.email_address,
           name: u.teacher&.name,
+          name_kana:u.teacher&.name_kana,
           classname: u.teacher&.class_rooms&.first&.classname
         }
       },

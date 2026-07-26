@@ -12,28 +12,28 @@ User.find_or_create_by!(email_address: "admin@example.com") do |u|
 end
 
 classes = [
-  [ 1, 1, "青木", "aoki", "1年1組", :normal ],
-  [ 1, 2, "石川", "ishikawa", "1年2組", :normal ],
-  [ 2, 1, "上田", "ueda", "2年1組", :normal ],
-  [ 2, 2, "遠藤", "endo", "2年2組", :normal ],
-  [ 3, 1, "岡田", "okada", "3年1組", :normal ],
-  [ 3, 2, "加藤", "kato_t", "3年2組", :normal ],
-  [ 4, 1, "木村", "kimura", "4年1組", :normal ],
-  [ 4, 2, "小林", "kobayashi_t", "4年2組", :normal ],
-  [ 5, 1, "斎藤", "saito", "5年1組", :normal ],
-  [ 5, 2, "佐々木", "sasaki", "5年2組", :normal ],
-  [ 6, 1, "田中", "tanaka_t", "6年1組", :normal ],
-  [ 6, 2, "中村", "nakamura_t", "6年2組", :normal ],
-  [ 0, 1, "林", "hayashi", "ひまわり", :support ]
+  [ 1, 1, "青木", "あおき", "aoki", "1年1組", :normal ],
+  [ 1, 2, "石川", "いしかわ", "ishikawa", "1年2組", :normal ],
+  [ 2, 1, "上田", "うえだ", "ueda", "2年1組", :normal ],
+  [ 2, 2, "遠藤", "えんどう", "endo", "2年2組", :normal ],
+  [ 3, 1, "岡田", "おかだ", "okada", "3年1組", :normal ],
+  [ 3, 2, "加藤", "かとう", "kato_t", "3年2組", :normal ],
+  [ 4, 1, "木村", "きむら", "kimura", "4年1組", :normal ],
+  [ 4, 2, "小林", "こばやし", "kobayashi_t", "4年2組", :normal ],
+  [ 5, 1, "斎藤", "さいとう", "saito", "5年1組", :normal ],
+  [ 5, 2, "佐々木", "ささき", "sasaki", "5年2組", :normal ],
+  [ 6, 1, "田中", "たなか", "tanaka_t", "6年1組", :normal ],
+  [ 6, 2, "中村", "なかむら", "nakamura_t", "6年2組", :normal ],
+  [ 0, 1, "林", "はやし", "hayashi", "ひまわり", :support ]
 ]
 
-classes.each do |grade, section, teacher_name, teacher_email_local, class_name, room_type|
+classes.each do |grade, section, teacher_name, teacher_name_kana,teacher_email_local, class_name, room_type|
   user = User.find_or_create_by!(email_address: "#{teacher_email_local}@example.com") do |u|
     u.password = "password"
     u.role = "teacher"
   end
   teacher = user.teacher
-  teacher.update!(name: teacher_name)
+  teacher.update!(name: teacher_name,name_kana:teacher_name_kana)
 
   ClassRoom.find_or_create_by!(grade: grade, section: section) do |c|
     c.classname = class_name
@@ -42,8 +42,8 @@ classes.each do |grade, section, teacher_name, teacher_email_local, class_name, 
   end
 end
 
-normal_classes = classes.select{|c|c[5] != :support}
-classes.each do |grade, section, teacher_name, teacher_email_local, class_name, room_type|
+normal_classes = classes.select{|c|c[6] != :support}
+classes.each do |grade, section, teacher_name,teacher_name_kana, teacher_email_local, class_name, room_type|
   target_count= room_type == :support ? 10 : 20
   current_count = 0
   while current_count < target_count
