@@ -4,27 +4,25 @@ schedule = Schedule.find_or_create_by!(
   name: "2026年個別面談",
   year: 2026)
 
-  
-
 User.find_or_create_by!(email_address: "admin@example.com") do |u|
   u.password="password"
   u.role="admin"
 end
 
 classes = [
-  [ 1, 1, "青木", "あおき", "aoki", "1年1組", :normal ],
-  [ 1, 2, "石川", "いしかわ", "ishikawa", "1年2組", :normal ],
-  [ 2, 1, "上田", "うえだ", "ueda", "2年1組", :normal ],
-  [ 2, 2, "遠藤", "えんどう", "endo", "2年2組", :normal ],
-  [ 3, 1, "岡田", "おかだ", "okada", "3年1組", :normal ],
-  [ 3, 2, "加藤", "かとう", "kato_t", "3年2組", :normal ],
-  [ 4, 1, "木村", "きむら", "kimura", "4年1組", :normal ],
-  [ 4, 2, "小林", "こばやし", "kobayashi_t", "4年2組", :normal ],
-  [ 5, 1, "斎藤", "さいとう", "saito", "5年1組", :normal ],
-  [ 5, 2, "佐々木", "ささき", "sasaki", "5年2組", :normal ],
-  [ 6, 1, "田中", "たなか", "tanaka_t", "6年1組", :normal ],
-  [ 6, 2, "中村", "なかむら", "nakamura_t", "6年2組", :normal ],
-  [ 0, 1, "林", "はやし", "hayashi", "ひまわり", :support ]
+  [ 1, 1, "青木花子", "あおきはなこ", "aoki", "1年1組", :normal ],
+  [ 1, 2, "石川健太", "いしかわけんた", "ishikawa", "1年2組", :normal ],
+  [ 2, 1, "上田美咲", "うえだみさき", "ueda", "2年1組", :normal ],
+  [ 2, 2, "遠藤大輔", "えんどうだいすけ", "endo", "2年2組", :normal ],
+  [ 3, 1, "岡田真由美", "おかだまゆみ", "okada", "3年1組", :normal ],
+  [ 3, 2, "加藤修", "かとうおさむ", "kato_t", "3年2組", :normal ],
+  [ 4, 1, "木村由紀", "きむらゆき", "kimura", "4年1組", :normal ],
+  [ 4, 2, "小林隆", "こばやしたかし", "kobayashi_t", "4年2組", :normal ],
+  [ 5, 1, "斎藤香織", "さいとうかおり", "saito", "5年1組", :normal ],
+  [ 5, 2, "佐々木誠", "ささきまこと", "sasaki", "5年2組", :normal ],
+  [ 6, 1, "田中裕子", "たなかゆうこ", "tanaka_t", "6年1組", :normal ],
+  [ 6, 2, "中村健一", "なかむらけんいち", "nakamura_t", "6年2組", :normal ],
+  [ 0, 1, "林麻衣", "はやしまい", "hayashi", "ひまわり", :support ]
 ]
 
 classes.each do |grade, section, teacher_name, teacher_name_kana,teacher_email_local, class_name, room_type|
@@ -49,11 +47,18 @@ classes.each do |grade, section, teacher_name,teacher_name_kana, teacher_email_l
   while current_count < target_count
     gimei_last_name = Gimei.last
     gimei_first_name = Gimei.first
+  
     # １人目の苗字名前
     family_last_name = gimei_last_name.kanji
     family_last_name_kana = gimei_last_name.hiragana
-    role_name = family_last_name
-    role_name_kana = family_last_name_kana
+
+    gimei_parent_first_name = Gimei.first
+    # 保護者名（苗字＋名前）
+    parent_full_name = family_last_name + gimei_parent_first_name.kanji
+    parent_full_name_kana = family_last_name_kana + gimei_parent_first_name.hiragana
+    role_name = parent_full_name
+    role_name_kana = parent_full_name_kana
+
     # Userテーブルに家族の苗字の情報が入る
     parent_user = User.create!(
       email_address:Faker::Internet.unique.email,
