@@ -11,7 +11,7 @@ class Api::V1::AdminController < ApplicationController
           id: u.id,
           email_address: u.email_address,
           name: u.teacher&.name,
-          name_kana:u.teacher&.name_kana,
+          name_kana: u.teacher&.name_kana,
           classname: u.teacher&.class_rooms&.first&.classname
         }
       },
@@ -72,7 +72,7 @@ class Api::V1::AdminController < ApplicationController
       @family = @user.family
       @family.update(name: params[:family_name], name_kana: params[:name_kana])
       children_params_list.each do |child_attrs|
-        child = Child.new(name: child_attrs[:name], family_id: @family.id, schedule_id: schedule.id)
+        child = Child.new(name: child_attrs[:name], name_kana: child_attrs[:name_kana], family_id: @family.id, schedule_id: schedule.id)
         unless child.save
           render json: { errors: child.errors.full_messages }, status: :unprocessable_entity
           raise ActiveRecord::Rollback
@@ -157,7 +157,7 @@ class Api::V1::AdminController < ApplicationController
 
   def children_params_list
     params.require(:children).map do |child|
-      child.permit(:name, :class_room_id)
+      child.permit(:name, :name_kana, :class_room_id)
     end
   end
 
