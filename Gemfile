@@ -55,12 +55,12 @@ group :development, :test do
   gem "pry-doc"
   gem "pry-rails"
   gem "rspec-rails"
-end
-group :development, :test do
   gem "factory_bot_rails"
-  gem "faker"
-  gem "gimei"
+
 end
+gem "faker"
+
+gem "gimei"
 
 gem "jwt"
 
