@@ -58,6 +58,8 @@ group :development, :test do
 end
 group :development, :test do
   gem "factory_bot_rails"
+  gem "faker"
+  gem "gimei"
 end
 
 gem "jwt"
@@ -65,3 +67,5 @@ gem "jwt"
 gem "mysql2"
 
 gem "oauth2"
+
+gem "grover"

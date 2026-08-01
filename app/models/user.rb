@@ -3,6 +3,7 @@ class User < ApplicationRecord
     encrypts :google_refresh_token
     has_secure_password
     attr_accessor :role_name
+    attr_accessor :role_name_kana
     attr_accessor :reset_token
     validates :email_address, presence: true, uniqueness: true,
               format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -64,7 +65,7 @@ def create_role_record
     if role == "teacher"
         Teacher.create!(user: self)
     elsif role == "parent"
-        Family.create!(user: self, name: role_name)
+        Family.create!(user: self, name: role_name, name_kana: role_name_kana)
     end
 end
 end
