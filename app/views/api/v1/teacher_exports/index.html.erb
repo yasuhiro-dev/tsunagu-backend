@@ -1,0 +1,42 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+
+@font-face {
+  font-family: "NotoSansJP";
+  src: url(data:font/truetype;charset=utf-8;base64,<%= @font_base64 %>) format("truetype");
+}
+body {
+     font-family: "NotoSansJP";
+  }
+table {
+    border-collapse: collapse;
+  }
+td {
+    border: 1px solid #333;
+    padding: 4px 8px;
+  }
+</style>
+</head>
+
+<body>
+<table>
+  <tr>
+    <td></td>
+    <% @date_list.each do |date| %>
+    <td><%= date %></td>
+    <% end %>
+  </tr>
+  <% @group_child.each do |time,dates| %>
+  <tr>
+    <td><%= time %></td>
+    <% dates.each do |date,children| %>
+    <td><%= children.join("、") %></td>
+    <% end %>
+  </tr>
+  <% end %>
+</table>
+</body>
+
+</html>

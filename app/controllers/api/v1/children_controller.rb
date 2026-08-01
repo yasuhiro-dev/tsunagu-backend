@@ -21,7 +21,7 @@ class Api::V1::ChildrenController<ApplicationController
             id: c.id,
             child_name: c.name,
             family_name: c.family.name,
-            child_name_kana:c.name_kana,
+            child_name_kana: c.name_kana
         }}, status: :ok
     end
 end
