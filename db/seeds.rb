@@ -25,13 +25,13 @@ classes = [
   [ 0, 1, "林麻衣", "はやしまい", "hayashi", "ひまわり", :support ]
 ]
 
-classes.each do |grade, section, teacher_name, teacher_name_kana,teacher_email_local, class_name, room_type|
+classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_local, class_name, room_type|
   user = User.find_or_create_by!(email_address: "#{teacher_email_local}@example.com") do |u|
     u.password = "password"
     u.role = "teacher"
   end
   teacher = user.teacher
-  teacher.update!(name: teacher_name,name_kana:teacher_name_kana)
+  teacher.update!(name: teacher_name, name_kana: teacher_name_kana)
 
   ClassRoom.find_or_create_by!(grade: grade, section: section) do |c|
     c.classname = class_name
@@ -40,14 +40,14 @@ classes.each do |grade, section, teacher_name, teacher_name_kana,teacher_email_l
   end
 end
 
-normal_classes = classes.select{|c|c[6] != :support}
-classes.each do |grade, section, teacher_name,teacher_name_kana, teacher_email_local, class_name, room_type|
+normal_classes = classes.select { |c|c[6] != :support }
+classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_local, class_name, room_type|
   target_count= room_type == :support ? 10 : 20
   current_count = 0
   while current_count < target_count
     gimei_last_name = Gimei.last
     gimei_first_name = Gimei.first
-  
+
     # １人目の苗字名前
     family_last_name = gimei_last_name.kanji
     family_last_name_kana = gimei_last_name.hiragana
@@ -61,43 +61,43 @@ classes.each do |grade, section, teacher_name,teacher_name_kana, teacher_email_l
 
     # Userテーブルに家族の苗字の情報が入る
     parent_user = User.create!(
-      email_address:Faker::Internet.unique.email,
+      email_address: Faker::Internet.unique.email,
       password: "password",
-      role:"parent",
-      role_name:role_name,
-      role_name_kana:role_name_kana
+      role: "parent",
+      role_name: role_name,
+      role_name_kana: role_name_kana
       )
-    
-    family = parent_user.family 
+
+    family = parent_user.family
     # １人目の苗字＋名前
     family_full_name = family_last_name + gimei_first_name.kanji
     family_full_name_kana = family_last_name_kana + gimei_first_name.hiragana
     # Childテーブルに名前と家族情報を入れる
-    first_child = Child.find_or_create_by!(name: family_full_name, family: family,name_kana:family_full_name_kana)
-    # クラス情報を入れる
+    first_child = Child.find_or_create_by!(name: family_full_name, family: family, name_kana: family_full_name_kana)
+      # クラス情報を入れる
       class_room = ClassRoom.find_by!(
-        grade: grade,   
+        grade: grade,
         section: section
         )
-    # 子供とクラスの情報を繋げる
+      # 子供とクラスの情報を繋げる
       ChildClassRoom.find_or_create_by!(
         child: first_child,
         class_room: class_room
-        ) 
+        )
     current_count += 1
     # ３０％の確率で処理を行う
     if rand < 0.3
-    # 兄弟の下の名前を生成する
+      # 兄弟の下の名前を生成する
       gimei_siblings_first_name = Gimei.first
-    # 兄弟の苗字＋名前
+      # 兄弟の苗字＋名前
       siblings_full_name = family_last_name + gimei_siblings_first_name.kanji
       siblings_full_name_kana = family_last_name_kana + gimei_siblings_first_name.hiragana
-    # Childテーブルにfamily情報を繋げる
-      sibling_child =Child.find_or_create_by!(name:siblings_full_name, family: family ,name_kana:siblings_full_name_kana)
+      # Childテーブルにfamily情報を繋げる
+      sibling_child =Child.find_or_create_by!(name: siblings_full_name, family: family, name_kana: siblings_full_name_kana)
       classes_sample = normal_classes.sample
       siblings_class_room = ClassRoom.find_by!(
-        grade:classes_sample[0],
-        section:classes_sample[1]
+        grade: classes_sample[0],
+        section: classes_sample[1]
       )
       ChildClassRoom.find_or_create_by!(
         child: sibling_child,
@@ -146,9 +146,9 @@ end
 
 
 Child.all.each do |child|
-  child_room_type = child.child_class_rooms.find{|c|c.class_room.room_type == "normal"}
+  child_room_type = child.child_class_rooms.find { |c|c.class_room.room_type == "normal" }
   child_teacher = child_room_type.class_room.teacher
-  slot = MeetingSlot.where(teacher:child_teacher).available.first
+  slot = MeetingSlot.where(teacher: child_teacher).available.first
     next if slot.nil?
     Assignment.find_or_create_by!(
         child: child,
