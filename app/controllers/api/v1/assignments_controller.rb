@@ -9,7 +9,6 @@ module Api
           )
           if assignment.save
             send_confirmation_email(assignment)
-            register_confirmation_event(assignment)
             render json: assignment, status: :created
           else
             render json: { errors: assignment.errors.full_messages }, status: :unprocessable_entity

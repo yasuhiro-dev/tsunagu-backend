@@ -60,7 +60,7 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
     role_name_kana = parent_full_name_kana
 
     # Userテーブルに家族の苗字の情報が入る
-    parent_user = User.create!(
+    parent_user = User.find_or_create_by!(
       email_address: Faker::Internet.unique.email,
       password: "password",
       role: "parent",
@@ -129,7 +129,7 @@ end
 
 teachers.each do |teacher|
   dates.each do |date|
-    start_time = Time.parse("#{date} 15:00")
+    start_time = Time.zone.parse("#{date} 15:00")
     6.times do
       MeetingSlot.find_or_create_by!(
         schedule: schedule,
