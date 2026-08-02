@@ -142,4 +142,3 @@ teachers.each do |teacher|
     end
   end
 end
-
