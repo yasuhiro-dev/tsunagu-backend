@@ -60,13 +60,12 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
     role_name_kana = parent_full_name_kana
 
     # Userテーブルに家族の苗字の情報が入る
-    parent_user = User.find_or_create_by!(
-      email_address: Faker::Internet.unique.email,
-      password: "password",
-      role: "parent",
-      role_name: role_name,
-      role_name_kana: role_name_kana
-      )
+    parent_user = User.find_or_create_by!(email_address: Faker::Internet.unique.email) do |u|
+      u.password = "password"
+      u.role = "parent"
+      u.role_name = role_name
+      u.role_name_kana = role_name_kana
+    end
 
     family = parent_user.family
     # １人目の苗字＋名前
@@ -144,24 +143,3 @@ teachers.each do |teacher|
   end
 end
 
-
-Child.all.each do |child|
-  child_room_type = child.child_class_rooms.find { |c|c.class_room.room_type == "normal" }
-  child_teacher = child_room_type.class_room.teacher
-  slot = MeetingSlot.where(teacher: child_teacher).available.first
-    next if slot.nil?
-    Assignment.find_or_create_by!(
-        child: child,
-        meeting_slot: slot
-    )
-    slot.update!(status: :reserved)
-end
-
-Family.all.each do |family|
-  MeetingSlot.all.sample(2).uniq.each do |slot|
-    FamilyUnavailability.find_or_create_by!(
-      family: family,
-      meeting_slot: slot
-    )
-  end
-end
