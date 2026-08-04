@@ -22,7 +22,7 @@ class Api::V1::ChildrenController<ApplicationController
         .where(child_class_rooms: { class_room_id: teacher.class_room_ids })
         unassigned_children = children.includes(:family).where.not(id: Assignment.select(:child_id))
 
-        render json: children.map { |c|{
+        render json: unassigned_children.map { |c|{
             id: c.id,
             child_name: c.name,
             family_name: c.family.name,
