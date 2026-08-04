@@ -32,11 +32,33 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
   end
   teacher = user.teacher
   teacher.update!(name: teacher_name, name_kana: teacher_name_kana)
-
   ClassRoom.find_or_create_by!(grade: grade, section: section) do |c|
     c.classname = class_name
     c.teacher = teacher
     c.room_type = room_type
+  end
+end
+
+teachers = Teacher.all
+start_date = Date.parse("2026-06-01")
+dates = 5.times.map do |i|
+  start_date + i
+end
+
+teachers.each do |teacher|
+  dates.each do |date|
+    start_time = Time.zone.parse("#{date} 15:00")
+    6.times do
+      MeetingSlot.find_or_create_by!(
+        schedule: schedule,
+        teacher: teacher,
+        start_at: start_time,
+        end_at: start_time + 15.minutes
+      ) do |slot|
+        slot.status = :available
+      end
+      start_time += 15.minutes
+    end
   end
 end
 
@@ -72,7 +94,7 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
     family_full_name = family_last_name + gimei_first_name.kanji
     family_full_name_kana = family_last_name_kana + gimei_first_name.hiragana
     # Childテーブルに名前と家族情報を入れる
-    first_child = Child.find_or_create_by!(name: family_full_name, family: family, name_kana: family_full_name_kana)
+    first_child = Child.find_or_create_by!(name: family_full_name, family: family, name_kana: family_full_name_kana, schedule: schedule)
       # クラス情報を入れる
       class_room = ClassRoom.find_by!(
         grade: grade,
@@ -92,7 +114,7 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
       siblings_full_name = family_last_name + gimei_siblings_first_name.kanji
       siblings_full_name_kana = family_last_name_kana + gimei_siblings_first_name.hiragana
       # Childテーブルにfamily情報を繋げる
-      sibling_child =Child.find_or_create_by!(name: siblings_full_name, family: family, name_kana: siblings_full_name_kana)
+      sibling_child =Child.find_or_create_by!(name: siblings_full_name, family: family, name_kana: siblings_full_name_kana, schedule: schedule)
       classes_sample = normal_classes.sample
       siblings_class_room = ClassRoom.find_by!(
         grade: classes_sample[0],
@@ -115,30 +137,11 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
         class_room: support_class_room
         )
     end
-  end
-end
+    unavailable_slots = MeetingSlot.where(teacher_id: class_room.teacher.id).sample(3)
 
-
-
-teachers = Teacher.all
-start_date = Date.parse("2026-06-01")
-dates = 5.times.map do |i|
-  start_date + i
-end
-
-teachers.each do |teacher|
-  dates.each do |date|
-    start_time = Time.zone.parse("#{date} 15:00")
-    6.times do
-      MeetingSlot.find_or_create_by!(
-        schedule: schedule,
-        teacher: teacher,
-        start_at: start_time,
-        end_at: start_time + 15.minutes
-      ) do |slot|
-        slot.status = :available
-      end
-      start_time += 15.minutes
+    unavailability = unavailable_slots.each do |slot|
+      family.family_unavailabilities.create!(meeting_slot_id: slot.id)
     end
+    family.update(submitted: true)
   end
 end
