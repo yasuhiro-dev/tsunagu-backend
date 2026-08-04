@@ -1,11 +1,12 @@
 module Scheduling
   class ScheduleAssigner
-    def initialize(schedule)
+    def initialize(schedule, children)
         @schedule = schedule
+        @children = children
     end
 
     def call
-    groups = GroupChildren.new(@schedule).call
+    groups = GroupChildren.new(@schedule, @children).call
     sorted_groups = PrioritySort.new.call(groups)
     sorted_groups.each do |group|
         slots = AvailableSlots.new(@schedule).call(group)

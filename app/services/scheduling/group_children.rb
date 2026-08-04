@@ -1,12 +1,13 @@
 module Scheduling
   class GroupChildren
-    def initialize(schedule)
+    def initialize(schedule, children)
       @schedule = schedule
+      @children = children
     end
 
     def call
       groups = []
-      children = Child.where(schedule_id: @schedule.id)
+      children = @children.where(schedule_id: @schedule.id)
       siblings = children.group_by(&:family_id)
 
       siblings.each do |family_id, family_children|
