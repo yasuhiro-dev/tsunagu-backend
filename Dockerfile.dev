@@ -26,6 +26,10 @@ ENV RAILS_ENV="development" \
 COPY Gemfile Gemfile.lock ./
 RUN bundle install
 COPY . .
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROME_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROME_HEADLESS_SHELL_DOWNLOAD=true
+RUN npm install
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
