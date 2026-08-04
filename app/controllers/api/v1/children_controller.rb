@@ -16,7 +16,12 @@ class Api::V1::ChildrenController<ApplicationController
     end
 
     def unassigned
-        children = Child.includes(:family).where.not(id: Assignment.select(:child_id))
+        teacher = current_user.teacher
+        children = Child.includes(:family, :assignments)
+        .joins(:child_class_rooms)
+        .where(child_class_rooms: { class_room_id: teacher.class_room_ids })
+        unassigned_children = children.includes(:family).where.not(id: Assignment.select(:child_id))
+
         render json: children.map { |c|{
             id: c.id,
             child_name: c.name,
