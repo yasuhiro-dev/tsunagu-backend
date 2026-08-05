@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe Scheduling::GroupChildren do
  describe "#call" do
     let(:schedule) { create(:schedule) }
-    let(:children) {Child}
-    subject { Scheduling::GroupChildren.new(schedule,children).call }
+    let(:children) { Child }
+    subject { Scheduling::GroupChildren.new(schedule, children).call }
 
     context "一人っ子かつ支援級なしの場合" do
         before do

@@ -11,19 +11,19 @@ RSpec.describe "Api::V1::Children", type: :request do
     end
 
     context "teacherでログインしている場合" do
-      #teacherを作る
+      # teacherを作る
       let!(:teacher) { create(:teacher) }
       # teacherが所属するclass_roomを作る
       let!(:class_room) { create(:class_room, teacher: teacher) }
       # 現在ログイン中のteacherを作り、headersへ
-      let!(:teacher_user) { create(:user, role: "teacher", teacher: teacher ) }
+      let!(:teacher_user) { create(:user, role: "teacher", teacher: teacher) }
       let(:headers) { auth_headers_for(teacher_user) }
       # 児童に作成しクラスを当てはめる
       let!(:child) { create(:child) }
       before do
         child.class_rooms << class_room
       end
-      
+
 
       it "200が返り、割り当てされていないchildの情報が渡る" do
         subject

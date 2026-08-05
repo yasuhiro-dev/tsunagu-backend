@@ -126,7 +126,7 @@ class Api::V1::AdminController < ApplicationController
       child.assignments.destroy_all
       children << child
     end
-    Scheduling::ScheduleAssigner.new(schedule,Child.where(id:children.map{|c|c.id})).call
+    Scheduling::ScheduleAssigner.new(schedule, Child.where(id: children.map { |c|c.id })).call
     render json: { message: "更新しました" }, status: :ok
   end
 
