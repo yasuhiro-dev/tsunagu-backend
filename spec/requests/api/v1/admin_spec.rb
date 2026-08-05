@@ -11,24 +11,28 @@ RSpec.describe "Api::V1::Admin", type: :request do
     end
 
     context "adminでログインしている場合" do
-      let(:admin_user) { create(:user, role: "admin") }
+      let!(:admin_user) { create(:user, role: "admin") }
       let(:headers) { auth_headers_for(admin_user) }
-      let(:teacher) { create(:teacher) }
+      let!(:teacher) { create(:teacher) }
       let!(:teacher_user) { create(:user, role: "teacher", teacher: teacher) }
-      let(:class_room) { create(:class_room, teacher: teacher) }
+      let!(:class_room) { create(:class_room, teacher: teacher) }
       let!(:family_user) { create(:user, role: "parent") }
       let!(:family) { family_user.family }
-      let(:child) { create(:child, family: family) }
+      let!(:child) { create(:child, family: family) }
       before do
         child.class_rooms << class_room
       end
       it "200が返り、教師・保護者の情報を取得する" do
-        subject
-        expect(response).to have_http_status(:ok)
-        res = JSON.parse(response.body)
-        expect(res["teachers"].first["classname"]).to eq(class_room.classname)
-        expect(res["parents"].first["children_name"]).to eq(child.name)
-      end
+  subject
+  puts "expected classname: #{class_room.classname}"
+  res = JSON.parse(response.body)
+  puts "actual res: #{res}"
+  puts "DB config: #{ActiveRecord::Base.connection_db_config.configuration_hash}"
+  puts "teacher count in DB right now: #{User.where(role: "teacher").count}"
+  expect(response).to have_http_status(:ok)
+  expect(res["teachers"].first["classname"]).to eq(class_room.classname)
+  expect(res["parents"].first["children_name"]).to eq(child.name)
+end
     end
 
     context "adminではない場合(parent)" do

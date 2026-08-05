@@ -12,7 +12,7 @@ class Api::V1::AdminController < ApplicationController
           email_address: u.email_address,
           name: u.teacher&.name,
           name_kana: u.teacher&.name_kana,
-          classname: u.teacher&.class_rooms&.first&.classname
+          classname: u.teacher&.class_rooms&.map { |class_room| class_room.classname }&.join("・")
         }
       },
       parents: parents.map { |u|
@@ -114,7 +114,9 @@ class Api::V1::AdminController < ApplicationController
   end
 
   def update_parent
+    puts "params:#{params}"
     schedule = Schedule.order(created_at: :desc).first
+    children = []
     user = User.find(params[:id])
     user.family.update!(name: params[:name])
     params[:children].each do |child_params|
@@ -122,8 +124,9 @@ class Api::V1::AdminController < ApplicationController
       child.update!(name: child_params[:name], schedule_id: schedule&.id)
       child.class_rooms = ClassRoom.where(id: child_params[:class_room_ids])
       child.assignments.destroy_all
+      children << child
     end
-    Scheduling::ScheduleAssigner.new(schedule).call
+    Scheduling::ScheduleAssigner.new(schedule, Child.where(id: children.map { |c|c.id })).call
     render json: { message: "更新しました" }, status: :ok
   end
 
