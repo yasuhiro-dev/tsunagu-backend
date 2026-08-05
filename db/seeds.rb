@@ -1,3 +1,4 @@
+puts "🚨 SEEDS.RB WAS EXECUTED 🚨"
 Faker::Config.locale = 'ja'
 
 schedule = Schedule.find_or_create_by!(

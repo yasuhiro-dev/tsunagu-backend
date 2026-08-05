@@ -1,5 +1,5 @@
 class Api::V1::SchedulesController < ApplicationController
-    before_action -> { authorize_role!("admin", "teacher") }
+    before_action -> { authorize_role!("teacher") }
     def create
         teacher = current_user.teacher
         children = Child.joins(:child_class_rooms)

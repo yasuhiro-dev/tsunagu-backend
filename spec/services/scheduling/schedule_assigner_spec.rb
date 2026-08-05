@@ -1,7 +1,8 @@
 RSpec.describe Scheduling::ScheduleAssigner do
   describe "#call" do
     let(:schedule) { create(:schedule) }
-    let(:assigner) { described_class.new(schedule) }
+    let(:children) {create(:child)}
+    let(:assigner) { described_class.new(schedule,children) }
     let(:group1) { double("group1") }
     let(:slots) { [ double("slot") ] }
 

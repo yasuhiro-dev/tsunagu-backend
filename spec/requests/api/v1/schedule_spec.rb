@@ -10,15 +10,6 @@ RSpec.describe "Api::V1::Schedule", type: :request do
     it_behaves_like "未ログインだと401が返る"
     end
 
-    context "adminでログインしている場合" do
-      let(:admin_user) { create(:user, role: "admin") }
-      let(:headers) { auth_headers_for(admin_user)  }
-       it "200が返る" do
-        subject
-       expect(response).to have_http_status(:ok)
-       end
-      end
-
     context "teacherでログインしている場合" do
       let(:teacher_user) { create(:user, role: "teacher") }
       let(:headers) { auth_headers_for(teacher_user)  }
@@ -28,7 +19,7 @@ RSpec.describe "Api::V1::Schedule", type: :request do
        end
       end
 
-    context "admin/teacherではない場合(parent)" do
+    context "teacherではない場合(parent)" do
       let(:parent) { create(:user, role: "parent") }
       let(:headers) { auth_headers_for(parent)  }
 
