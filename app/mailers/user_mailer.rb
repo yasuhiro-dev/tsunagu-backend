@@ -1,5 +1,5 @@
 class UserMailer < ApplicationMailer
-     def password_reset
+    def password_reset
     @user = params[:user]
     @token = @user.reset_token
     @url = "https://tsunagu-app.com/password_reset_confirm?token=#{@token}"
