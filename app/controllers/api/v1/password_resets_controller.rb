@@ -16,6 +16,7 @@ class Api::V1::PasswordResetsController < ApplicationController
         render json: { message: "メール送信に失敗しました" }, status: :not_found
     end
   end
+
   # メソッド全体の役割:トークンの照合によってユーザーを特定して、パスワードを更新するメソッド
   def update
       # フロントから渡されたトークンと、DBに保存されたreset_digestと一致するUserを見つける
