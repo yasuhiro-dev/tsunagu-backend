@@ -12,7 +12,6 @@ RSpec.shared_examples "未ログインだと200が返る" do
   end
 end
 
-
 RSpec.shared_examples "成功する" do |status|
   it "#{status}が返る" do
     subject
