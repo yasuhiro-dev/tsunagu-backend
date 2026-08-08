@@ -24,11 +24,7 @@ RSpec.describe "Api::V1::Admin", type: :request do
       end
       it "200が返り、教師・保護者の情報を取得する" do
   subject
-  puts "expected classname: #{class_room.classname}"
   res = JSON.parse(response.body)
-  puts "actual res: #{res}"
-  puts "DB config: #{ActiveRecord::Base.connection_db_config.configuration_hash}"
-  puts "teacher count in DB right now: #{User.where(role: "teacher").count}"
   expect(response).to have_http_status(:ok)
   expect(res["teachers"].first["classname"]).to eq(class_room.classname)
   expect(res["parents"].first["children_name"]).to eq(child.name)
