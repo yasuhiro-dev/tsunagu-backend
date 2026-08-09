@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_26_022415) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_08_230359) do
   create_table "assignments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "child_id"
     t.datetime "created_at", null: false
@@ -93,6 +93,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_022415) do
 
   create_table "schedules", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.datetime "deadline_at"
     t.string "name"
     t.datetime "updated_at", null: false
     t.integer "year"
