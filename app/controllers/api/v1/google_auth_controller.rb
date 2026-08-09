@@ -39,7 +39,7 @@ class Api::V1::GoogleAuthController < ApplicationController
 
     redirect_to "http://localhost:3001/settings?google_connected=true"
   end
-
+  # 現在ログイン中のユーザーがトークンを持っているか確認
   def status
     render json: { connected: current_user.google_access_token.present? }, status: :ok
   end

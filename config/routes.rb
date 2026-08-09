@@ -11,7 +11,7 @@ Rails.application.routes.draw do
       delete "/family_unavailabilities/:meeting_slot_id", to: "family_unavailabilities#destroy", as: "family_unavailability_meeting_slot"
       patch "/family_unavailabilities/:family_id", to: "family_unavailabilities#update", as: "family_unavailability_family"
       post "/schedules/:id", to: "schedules#create", as: "schedule"
-      get "/schedules/:id",to: "schedules#show"
+      get "/schedules/:id", to: "schedules#show"
       patch "/schedules/:id", to: "schedules#update"
       get "/class_rooms", to: "class_rooms#index"
       post "/users/parent", to: "users#create_parent"
@@ -37,7 +37,6 @@ Rails.application.routes.draw do
       get "/google_auth/status", to: "google_auth#status"
       post "/google_calendar/:id", to: "google_calendar#create"
       get "/teacher_exports", to: "teacher_exports#index"
-      
     end
   end
 end

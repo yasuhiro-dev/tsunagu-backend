@@ -1,7 +1,7 @@
 class Api::V1::SchedulesController < ApplicationController
-    before_action -> { authorize_role!("admin") }, only: [:update]
-    before_action -> { authorize_role!("teacher") }, only: [:create]
-    before_action -> { authorize_role!("teacher","parent","admin") }, only: [:show]
+    before_action -> { authorize_role!("admin") }, only: [ :update ]
+    before_action -> { authorize_role!("teacher") }, only: [ :create ]
+    before_action -> { authorize_role!("teacher", "parent", "admin") }, only: [ :show ]
 
     # 教師が面談日程の割り当てを確定する
     def create
@@ -21,7 +21,7 @@ class Api::V1::SchedulesController < ApplicationController
         # フロントからid=1が送られた場合2026年のschedule
         schedule = Schedule.find(params[:id])
         deadline = schedule.deadline_at
-        render json: {deadline_at: deadline}, status: :ok
+        render json: { deadline_at: deadline }, status: :ok
     end
 
     # 管理者が締切日を設定する
@@ -33,6 +33,6 @@ class Api::V1::SchedulesController < ApplicationController
         # 更新されたDBから取り出す
         update_schedule = schedule.deadline_at
         # フロント側も情報を更新できるように返す
-        render json: {deadline_at: update_schedule},status: :ok
+        render json: { deadline_at: update_schedule }, status: :ok
     end
 end
