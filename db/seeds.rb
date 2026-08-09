@@ -1,4 +1,3 @@
-puts "🚨 SEEDS.RB WAS EXECUTED 🚨"
 Faker::Config.locale = 'ja'
 
 schedule = Schedule.find_or_create_by!(
@@ -41,11 +40,12 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
 end
 
 teachers = Teacher.all
+# 面談の日程、枠の設定
 start_date = Date.parse("2026-06-01")
 dates = 5.times.map do |i|
   start_date + i
 end
-
+# 面談の時間設定
 teachers.each do |teacher|
   dates.each do |date|
     start_time = Time.zone.parse("#{date} 15:00")
