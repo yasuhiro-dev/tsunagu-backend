@@ -2,11 +2,14 @@ module Api
   module V1
     class AssignmentsController < ApplicationController
       before_action -> { authorize_role!("admin", "teacher") }
+
         def create
+          # 既に割り当てられたslotと児童をDBに保存する
           assignment = Assignment.new(
             meeting_slot_id: params[:meeting_slot_id],
             child_id: params[:child_id]
           )
+          # もし割り当てられたら、面談決定メールを送る
           if assignment.save
             send_confirmation_email(assignment)
             render json: assignment, status: :created
@@ -15,6 +18,7 @@ module Api
           end
         end
         private
+        # 面談決定メールのメソッド
         def send_confirmation_email(assignment)
           teacher_user = assignment.meeting_slot.teacher.user
           parent_user = assignment.child.family.user

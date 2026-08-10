@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       get "health_check", to: "health_check#index"
       post "/login", to: "sessions#create"
       get "/meeting_slots", to: "meeting_slots#index"
+      patch "/meeting_slots/bulk_update", to: "meeting_slots#bulk_update"
       get "/all_meeting_slots", to: "meeting_slots#all"
       get "/family_unavailabilities", to: "family_unavailabilities#index"
       post "/family_unavailabilities", to: "family_unavailabilities#create"
