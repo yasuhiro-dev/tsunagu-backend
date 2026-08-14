@@ -26,15 +26,15 @@ module Api
 
           # 時間の制約（familyモデルでメソッド管理）
           family = child.family
-          unavailable_start_at = family.family_unavailability_start_at #関連づけられるためにfamilyを取得してから
+          unavailable_start_at = family.family_unavailability_start_at # 関連づけられるためにfamilyを取得してから
 
           # 兄弟関係の面談表(childモデルでメソッド管理)
           siblings = child.siblings
-          siblings_meeting_schedule = siblings.map {|sibling|sibling.related_schedules}
+          siblings_meeting_schedule = siblings.map { |sibling|sibling.related_schedules }
 
           # 特別支援の面談表
           own_support_meeting_schedule = child.related_schedules
-          render json:{unavailable_start_at:unavailable_start_at,siblings_meeting_schedule:siblings_meeting_schedule,own_support_meeting_schedule:own_support_meeting_schedule}  , status: :ok
+          render json: { unavailable_start_at: unavailable_start_at, siblings_meeting_schedule: siblings_meeting_schedule, own_support_meeting_schedule: own_support_meeting_schedule }, status: :ok
         end
 
         # 面談編集メソッド
@@ -42,10 +42,10 @@ module Api
            ActiveRecord::Base.transaction do
             # assignments=[{from_assignment_id（移動元）,to_slot_id（移動先）},{}...]
             params[:assignments].each do |item|
-              # 移動元の情報をDBから取得
+            # 移動元の情報をDBから取得
             from_assignment = Assignment.find(item[:from_assignment_id])
             # 移動元の場所を、覚えておく（移動してしまうと、交換場所がわからなくなるため）
-            from_slot_id = from_assignment.meeting_slot_id  
+            from_slot_id = from_assignment.meeting_slot_id
             to_slot_id = item[:to_slot_id]
             # 移動先に誰かいるかDBをチェック
             to_assignment = Assignment.find_by(meeting_slot_id: to_slot_id)
@@ -53,7 +53,7 @@ module Api
         # もしいたら、移動先の児童を、移動元の児童の場所（from_slot_id）へ/いなければnill
         if to_assignment
             Assignment.where(id: to_assignment.id)
-            .update_all(meeting_slot_id: from_slot_id)         
+            .update_all(meeting_slot_id: from_slot_id)
         end
         # 移動元の児童を、移動先の場所（to_slot_id）へ
         Assignment.where(id: from_assignment.id)
@@ -75,7 +75,7 @@ module Api
       rescue => e
         render json: { error: "割り当ての修正に失敗しました: #{e.message}" }, status: :unprocessable_entity
       end
-      
+
         private
         # 面談決定メールのメソッド
         def send_confirmation_email(assignment)
@@ -89,7 +89,6 @@ module Api
                p "エラー詳細: #{e.message}"
           Rails.logger.error("メール送信に失敗しました: #{e.message}")
         end
-
     end
   end
 end
