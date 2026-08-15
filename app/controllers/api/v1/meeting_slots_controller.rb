@@ -30,7 +30,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
       return
     end
     meeting_slot_blocked.update_all(status: :blocked)
-    render json: meeting_slot_blocked
+    render json: meeting_slot_blocked, status: :ok
   end
 
 
