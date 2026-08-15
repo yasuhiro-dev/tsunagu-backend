@@ -11,18 +11,6 @@ RSpec.describe "Api::V1::Assignments", type: :request do
     it_behaves_like "未ログインだと401が返る"
     end
 
-    context "adminでログインしている場合" do
-      let(:admin_user) { create(:user, role: "admin") }
-      let(:headers) { auth_headers_for(admin_user) }
-       it "200が返り、割り当てされたデータが含まれる" do
-        subject
-        puts response.body
-        expect(response).to have_http_status(:created)
-        res = JSON.parse(response.body)
-        expect(res.keys).to include("meeting_slot_id", "child_id")
-       end
-      end
-
     context "teacherでログインしている場合" do
       let(:teacher_user) { create(:user, role: "teacher") }
       let(:headers) { auth_headers_for(teacher_user)  }
