@@ -143,6 +143,6 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
     unavailability = unavailable_slots.each do |slot|
       family.family_unavailabilities.create!(meeting_slot_id: slot.id)
     end
-    family.update(submitted: true)
+    family.update(submitted: rand < 0.8)
   end
 end

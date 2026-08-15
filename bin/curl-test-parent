@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# ログインしてトークンを取る（保護者デモでログイン）
+TOKEN=$(curl -s -X POST http://localhost:3000/api/v1/login \
+  -H "Content-Type: application/json" \
+  -d '{"email_address": "evangeline@torphy-wolf.example", "password": "password"}' \
+  | jq -r '.token')
+# そのトークンを持ってエンドポイントにアクセスする
+curl http://localhost:3000/api/v1/"$1" \
+  -H "Authorization: Bearer $TOKEN"
