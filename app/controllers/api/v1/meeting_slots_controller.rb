@@ -29,6 +29,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
       render json: { error: "予約済みに保護者が含まれています" }, status: :unprocessable_entity
       return
     end
+    p meeting_slot_blocked
     meeting_slot_blocked.update_all(status: :blocked)
     render json: meeting_slot_blocked, status: :ok
   end
