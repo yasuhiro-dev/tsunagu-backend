@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       get "/meeting_slots", to: "meeting_slots#index"
       patch "/meeting_slots/bulk_update", to: "meeting_slots#bulk_update"
       get "/all_meeting_slots", to: "meeting_slots#all"
+      get "/meeting_slots/blocked_slots", to: "meeting_slots#blocked_slots"
       get "/family_unavailabilities", to: "family_unavailabilities#index"
       post "/family_unavailabilities", to: "family_unavailabilities#create"
       delete "/family_unavailabilities/:meeting_slot_id", to: "family_unavailabilities#destroy", as: "family_unavailability_meeting_slot"

@@ -1,13 +1,12 @@
 class Api::V1::MeetingSlotsController < ApplicationController
   before_action -> { authorize_role!("teacher", "parent") }, only: [ :index ]
-  before_action -> { authorize_role!("parent") }, only: [ :all ]
+  before_action -> { authorize_role!("parent") }, only: [ :all, :blocked_slots ]
   before_action -> { authorize_role!("teacher") }, only: [ :bulk_update ]
 
   def all
     family = current_user.family
     teacher_ids = family.children.flat_map { |child| child.class_rooms.map(&:teacher_id) }
     slots = MeetingSlot.where(teacher_id: teacher_ids).includes(assignments: :child)
-
     slots = slots.group_by(&:start_at).map { |_, s| s.first }
 
     render json: slots.map { |slot|
@@ -29,11 +28,19 @@ class Api::V1::MeetingSlotsController < ApplicationController
       render json: { error: "予約済みに保護者が含まれています" }, status: :unprocessable_entity
       return
     end
-    p meeting_slot_blocked
     meeting_slot_blocked.update_all(status: :blocked)
     render json: meeting_slot_blocked, status: :ok
   end
 
+  # 教師の演壇表不可日程を保護者に反映
+  def blocked_slots
+    # 現在ログイン中のユーザーからを取得
+    family = current_user.family
+    class_rooms = family.children.flat_map { |c|c.class_rooms }
+    teacher = class_rooms.map { |r|r.teacher }
+    status = teacher.flat_map { |t|t.meeting_slots.where(status: :blocked) }
+  render json: status
+  end
 
   # 面談表を複製するメソッド
   def index
