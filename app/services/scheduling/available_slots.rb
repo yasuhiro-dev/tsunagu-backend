@@ -3,7 +3,7 @@ module Scheduling
     def initialize (schedule)
         @schedule = schedule
     end
-
+    # schedule_assignerから呼ばれる
     def call(group)
         teacher_ids = group.map do |g|
             room_type = g[:type] == :support ? "support" : "normal"
