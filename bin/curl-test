@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# ログインしてトークンを取る（教師デモでログイン）
+TOKEN=$(curl -s -X POST http://localhost:3000/api/v1/login \
+  -H "Content-Type: application/json" \
+  -d '{"email_address": "aoki@example.com", "password": "password"}' \
+  | jq -r '.token')
+# そのトークンを持ってvalid_slotsにアクセスする
+curl http://localhost:3000/api/v1/"$1" \
+  -H "Authorization: Bearer $TOKEN"

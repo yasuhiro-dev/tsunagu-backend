@@ -33,6 +33,8 @@ Rails.application.routes.draw do
       patch "/password_resets/:token", to: "password_resets#update", as: "password_resets_token"
       get "/assignment_stats", to: "assignment_stats#index"
       post "/assignments", to: "assignments#create"
+      patch "/assignments", to: "assignments#reassign"
+      get "/assignments/:id/valid_slots", to: "assignments#valid_slots"
       get "/google_auth/connect", to: "google_auth#connect"
       get "/google_auth/callback", to: "google_auth#callback"
       get "/google_auth/status", to: "google_auth#status"

@@ -16,6 +16,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_230359) do
     t.datetime "created_at", null: false
     t.bigint "meeting_slot_id"
     t.datetime "updated_at", null: false
+    # child, meeting_slotの組み合わせがテーブル全体で重複してはいけない（＝childかmeeting_slotが違っていればいい）
     t.index ["child_id", "meeting_slot_id"], name: "index_assignments_on_child_id_and_meeting_slot_id", unique: true
     t.index ["child_id"], name: "index_assignments_on_child_id"
     t.index ["meeting_slot_id"], name: "index_assignments_on_meeting_slot_id"

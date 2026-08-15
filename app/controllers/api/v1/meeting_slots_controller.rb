@@ -43,7 +43,6 @@ class Api::V1::MeetingSlotsController < ApplicationController
       if slots.empty?
         schedule = Schedule.order(created_at: :desc).first
         existing_slots = MeetingSlot.where(schedule_id: schedule, teacher_id: Teacher.first.id)
-
         existing_slots.each do |existing_slot|
           MeetingSlot.create!(
             schedule: schedule,
@@ -52,17 +51,16 @@ class Api::V1::MeetingSlotsController < ApplicationController
             end_at: existing_slot.end_at
           )
         end
-
         slots = MeetingSlot.where(teacher: teacher).includes(assignments: :child)
       end
-
       render json: slots.map { |slot|
         {
           id: slot.id,
           start_at: slot.start_at,
           end_at: slot.end_at,
           status: slot.status,
-          child_name: slot.assignments.first&.child&.name
+          child_name: slot.assignments.first&.child&.name,
+          assignment_id: slot.assignments.first&.id
         }
       }
     else
