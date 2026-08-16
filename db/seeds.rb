@@ -107,8 +107,8 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
         class_room: class_room
         )
     current_count += 1
-    # ３０％の確率で処理を行う
-    if rand < 0.3
+    # 15％の確率で処理を行う
+    if rand < 0.15
       # 兄弟の下の名前を生成する
       gimei_siblings_first_name = Gimei.first
       # 兄弟の苗字＋名前
