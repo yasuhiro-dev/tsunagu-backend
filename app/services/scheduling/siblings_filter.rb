@@ -2,23 +2,27 @@ module Scheduling
   class SiblingsFilter
     SLOT_INTERVAL_MINUTES = 15
 
-   def call(slots, group)
+  def call(slots, group)
   return slots unless siblings_group?(group)
 
   unavailable_ids = group.map { |g| g[:child] }
                          .flat_map { |child| child.family.family_unavailabilities.pluck(:meeting_slot_id) }
                          .uniq
-
-  normal_support_entries = group.select { |g| g[:type] == :normal || g[:type] == :support }
- child_slot_candidates = normal_support_entries.map do |entry|
+  # 担任の先生の面談slotを取り出す
+  child_slot_candidates = group.map do |entry|
+  # room_typeを特別支援と通常級で分ける[兄通常級][弟通常級・特別支援]
   room_type = entry[:type] == :support ? "support" : "normal"
+  # 担任の先生を割り出す　[兄　２−１][弟１−１　ひまわり]
   teacher_id = entry[:child].class_rooms.where(room_type: room_type).first&.teacher_id
+  # 面談表と担任の先生を一致させる
   slots.select { |s| s.teacher_id == teacher_id }
 end
-
+  #
   child_slot_candidates.first.product(*child_slot_candidates[1..]).each do |combo|
     combo.permutation.each do |ordered|
+     # 時間不可が含まれている又はそのslotがreservedの時は割り当てない
      next if ordered.any? { |s| unavailable_ids.include?(s.id) || s.status == "reserved" }
+
       return ordered if consecutive?(ordered)
     end
   end

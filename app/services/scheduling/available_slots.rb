@@ -12,6 +12,7 @@ module Scheduling
 
         MeetingSlot.where(schedule: @schedule)
                    .where(teacher_id: teacher_ids)
+                   .where(status: :available)  # availableなslotに絞る(教師の面談不可への対応)
                    .where.not(id: Assignment.select(:meeting_slot_id))
     end
   end

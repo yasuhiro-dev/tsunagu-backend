@@ -114,7 +114,6 @@ class Api::V1::AdminController < ApplicationController
   end
 
   def update_parent
-    puts "params:#{params}"
     schedule = Schedule.order(created_at: :desc).first
     children = []
     user = User.find(params[:id])
@@ -126,7 +125,6 @@ class Api::V1::AdminController < ApplicationController
       child.assignments.destroy_all
       children << child
     end
-    Scheduling::ScheduleAssigner.new(schedule, Child.where(id: children.map { |c|c.id })).call
     render json: { message: "更新しました" }, status: :ok
   end
 
