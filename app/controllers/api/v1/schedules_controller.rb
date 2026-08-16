@@ -35,6 +35,7 @@ class Api::V1::SchedulesController < ApplicationController
         # 更新されたDBから取り出す
         update_schedule = schedule.deadline_at
         # フロント側も情報を更新できるように返す
+        puts "ここです: #{update_schedule}"
         render json: { deadline_at: update_schedule }, status: :ok
     end
 end
