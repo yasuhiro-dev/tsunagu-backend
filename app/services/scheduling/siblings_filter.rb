@@ -5,23 +5,20 @@ module Scheduling
   def call(slots, group)
   return slots unless siblings_group?(group)
 
-  unavailable_ids = group.map { |g| g[:child] }
-                         .flat_map { |child| child.family.family_unavailabilities.pluck(:meeting_slot_id) }
-                         .uniq
   # 担任の先生の面談slotを取り出す
   child_slot_candidates = group.map do |entry|
-  # room_typeを特別支援と通常級で分ける[兄通常級][弟通常級・特別支援]
+  # room_typeを特別支援と通常級で分ける
   room_type = entry[:type] == :support ? "support" : "normal"
-  # 担任の先生を割り出す　[兄　２−１][弟１−１　ひまわり]
+  # 担任（通常級・支援級）の先生を割り出す
   teacher_id = entry[:child].class_rooms.where(room_type: room_type).first&.teacher_id
   # 面談表と担任の先生を一致させる
   slots.select { |s| s.teacher_id == teacher_id }
 end
-  #
+
   child_slot_candidates.first.product(*child_slot_candidates[1..]).each do |combo|
     combo.permutation.each do |ordered|
      # 時間不可が含まれている又はそのslotがreservedの時は割り当てない
-     next if ordered.any? { |s| unavailable_ids.include?(s.id) || s.status == "reserved" }
+     next if ordered.any? { |s| s.status == "reserved" }
 
       return ordered if consecutive?(ordered)
     end
