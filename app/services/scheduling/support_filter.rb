@@ -4,13 +4,13 @@ module Scheduling
 
     def call(slots, group)
       return slots unless support_group?(group)
-      # 特別支援学級に在籍する児童がいるグループから、特別支援学級の担任の先生を割り出す
+      # 特別支援学級に在籍する児童から、担任の先生を割り出す
       support_entry = group.find { |g| g[:type] == :support }
       support_teacher_id = support_entry[:child].class_rooms
                                                 .where(room_type: "support")
                                                 .first&.teacher_id
       return slots if support_teacher_id.nil?
-      # 特別支援学級に在籍するグループから、通常学級の担任の先生を割り出す
+      # 特別支援学級に在籍する児童から紐づいて、通常学級の担任の先生を割り出す
       normal_teacher_id = support_entry[:child].class_rooms
                                                .where(room_type: "normal")
                                                .first&.teacher_id
