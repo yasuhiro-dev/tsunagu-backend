@@ -1,6 +1,7 @@
 module Api
   module V1
     class AssignmentsController < ApplicationController
+      # 校内の教員は全員が面談調整に関わるため、担任クラスに関係なく参照可能とする
       before_action -> { authorize_role!("teacher") }
 
         def create
@@ -18,7 +19,7 @@ module Api
           end
         end
 
-        # バリデーション表示メソッド（時間の制約・兄弟/特別支援面談表）
+        # バリデーション表示（時間の制約・兄弟/特別支援面談表の取得）
         def valid_slots
           # フロントからURLに載せて１つのassignment_idを取得
           assignment = Assignment.find(params[:id])
