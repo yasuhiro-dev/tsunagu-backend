@@ -5,19 +5,23 @@ module Api
       before_action -> { authorize_role!("teacher") }
 
         def create
-          # 既に割り当てられたslotと児童をDBに保存する
           assignment = Assignment.new(
             meeting_slot_id: params[:meeting_slot_id],
             child_id: params[:child_id]
           )
-          # もし割り当てられたら、面談決定メールを送る
-          if assignment.save
-            send_confirmation_email(assignment)
-            render json: assignment, status: :created
-          else
-            render json: { errors: assignment.errors.full_messages }, status: :unprocessable_entity
+          ActiveRecord::Base.transaction do
+              # 割り当てられた場合、保存される
+              assignment.save!
+              # statusをreservedに変更する
+              assignment.meeting_slot.update!(status: "reserved")
           end
-        end
+          # 確認メールを送信する
+          send_confirmation_email(assignment)
+          render json: assignment, status: :created
+
+        rescue => e
+          render json: { error: "予約に失敗しました: #{e.message}" }, status: :unprocessable_entity
+      end
 
         # バリデーション表示（時間の制約・兄弟/特別支援面談表の取得）
         def valid_slots
@@ -43,39 +47,42 @@ module Api
            ActiveRecord::Base.transaction do
             # assignments=[{from_assignment_id（移動元）,to_slot_id（移動先）},{}...]
             params[:assignments].each do |item|
-            # 移動元の情報をDBから取得
+            # フロントからきた移動元と同じidを、Assignment（DB）から見つける
             from_assignment = Assignment.find(item[:from_assignment_id])
-            # 移動元の場所を、覚えておく（移動してしまうと、交換場所がわからなくなるため）
+            # 移動元の場所を、記録する（移動してしまうと、交換場所がわからなくなるため）
             from_slot_id = from_assignment.meeting_slot_id
             to_slot_id = item[:to_slot_id]
             # 移動先に誰かいるかDBをチェック
             to_assignment = Assignment.find_by(meeting_slot_id: to_slot_id)
 
-        # もしいたら、移動先の児童を、移動元の児童の場所（from_slot_id）へ/いなければnill
-        if to_assignment
-            Assignment.where(id: to_assignment.id)
-            .update_all(meeting_slot_id: from_slot_id)
-        end
-        # 移動元の児童を、移動先の場所（to_slot_id）へ
-        Assignment.where(id: from_assignment.id)
-                  .update_all(meeting_slot_id: to_slot_id)
-         end
-        end
-        # フロントの受け取りの型がMeetingSlotなのでその型に合わせてrenderする
-        slots = MeetingSlot.where(teacher: current_user.teacher).includes(assignments: :child)
-        render json: slots.map { |slot|
-          {
-            id: slot.id,
-            start_at: slot.start_at,
-            end_at: slot.end_at,
-            status: slot.status,
-            child_name: slot.assignments.first&.child&.name,
-            assignment_id: slot.assignments.first&.id
-          }
-        }
-      rescue => e
-        render json: { error: "割り当ての修正に失敗しました: #{e.message}" }, status: :unprocessable_entity
-      end
+            # 移動先（B）にいたら、移動元（A）の児童の場所へ変更する（B→A）
+            if to_assignment
+                to_assignment.update!(meeting_slot_id: from_slot_id)
+            else
+              # 移動先（B）にいない場合(A→□)
+              from_assignment.meeting_slot.update!(status: "available")
+              # 移動先（B）にはまだいないのでMeetingslotから変更
+              MeetingSlot.find(to_slot_id).update!(status: "reserved")
+            end
+            # 移動元（A）の児童を、移動先の場所へ変更する（A→B）
+            from_assignment.update!(meeting_slot_id: to_slot_id)
+            end
+            end
+            # フロントの受け取りの型がMeetingSlotなのでその型に合わせてrenderする
+            slots = MeetingSlot.where(teacher: current_user.teacher).includes(assignments: :child)
+            render json: slots.map { |slot|
+              {
+                id: slot.id,
+                start_at: slot.start_at,
+                end_at: slot.end_at,
+                status: slot.status,
+                child_name: slot.assignments.first&.child&.name,
+                assignment_id: slot.assignments.first&.id
+              }
+            }
+          rescue => e
+            render json: { error: "割り当ての修正に失敗しました: #{e.message}" }, status: :unprocessable_entity
+          end
 
         private
         # 面談決定メールのメソッド
