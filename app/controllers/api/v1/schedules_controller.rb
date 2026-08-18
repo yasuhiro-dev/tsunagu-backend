@@ -12,11 +12,16 @@ class Api::V1::SchedulesController < ApplicationController
         # 割り当てをリセットする
         meeting_slots = schedule.meeting_slots
         reserved_slots = meeting_slots.where(status: :reserved)
-        reserved_slots.update_all(status: :available)
-        Assignment.where(meeting_slot: meeting_slots).destroy_all
-        # コレらの情報をサービスクラスに渡す
+        # 割り当てが中途半端にならないようにエラーが起きたら中止
+        ActiveRecord::Base.transaction do
+        reserved_slots.update_all(status: :available) # 予約を全リセット
+        Assignment.where(meeting_slot: meeting_slots).destroy_all # slotを全削除
+        # サービスクラスに渡し、調整されて割り当てされる
         Scheduling::ScheduleAssigner.new(schedule, children).call
+        end
         render json: { message: "success" }, status: :ok
+        rescue => e
+            render json: { error: "割り当てに失敗しました: #{e.message}" }, status: :unprocessable_entity
     end
 
     # 締切日を参照する
