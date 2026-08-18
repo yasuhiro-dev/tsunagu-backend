@@ -10,13 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_08_230359) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_18_000000) do
   create_table "assignments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "child_id"
     t.datetime "created_at", null: false
     t.bigint "meeting_slot_id"
     t.datetime "updated_at", null: false
-    # child, meeting_slotの組み合わせがテーブル全体で重複してはいけない（＝childかmeeting_slotが違っていればいい）
     t.index ["child_id", "meeting_slot_id"], name: "index_assignments_on_child_id_and_meeting_slot_id", unique: true
     t.index ["child_id"], name: "index_assignments_on_child_id"
     t.index ["meeting_slot_id"], name: "index_assignments_on_meeting_slot_id"
@@ -66,7 +65,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_230359) do
     t.datetime "created_at", null: false
     t.string "name"
     t.string "name_kana"
-    t.boolean "submitted"
+    t.boolean "submitted", default: false, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
   end

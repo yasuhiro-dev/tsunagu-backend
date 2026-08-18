@@ -11,7 +11,7 @@ Rails.application.routes.draw do
       get "/family_unavailabilities", to: "family_unavailabilities#index"
       post "/family_unavailabilities", to: "family_unavailabilities#create"
       delete "/family_unavailabilities/:meeting_slot_id", to: "family_unavailabilities#destroy", as: "family_unavailability_meeting_slot"
-      patch "/family_unavailabilities/:family_id", to: "family_unavailabilities#update", as: "family_unavailability_family"
+      patch "/family_unavailabilities", to: "family_unavailabilities#update", as: "family_unavailability_family"
       post "/schedules/:id", to: "schedules#create"
       get "/schedules/:id", to: "schedules#show"
       patch "/schedules/:id", to: "schedules#update"
