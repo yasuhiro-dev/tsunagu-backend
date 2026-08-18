@@ -21,5 +21,20 @@ RSpec.describe "Api::V1::Families", type: :request do
     expect(res.keys).to include("submitted")
       end
     end
+
+    context "parentでログインしている場合" do
+      let(:parent_user) { create(:user, role: "parent") }
+      let(:headers) { auth_headers_for(parent_user) }
+      let(:family_b) { create(:family) }
+      # 無関係なfamily_bを使うためにsubjectを再定義（再利用するためにitより前で定義する）
+      subject { get(api_v1_family_path(family_b.id), headers: headers) }
+
+    it "他のfamily情報を取得できない" do
+      subject
+      expect(response).to have_http_status(:unauthorized)
+    res = JSON.parse(response.body)
+    expect(res.keys).to include("error")
+    end
+  end
   end
 end
