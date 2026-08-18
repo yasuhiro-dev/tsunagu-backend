@@ -17,6 +17,7 @@ RSpec.describe "Api::V1::Assignments", type: :request do
 
        it "200が返り、割り当てされたデータが含まれる" do
         subject
+        puts "レスポンス: #{response.body}"   # ← 一時的に追加
         expect(response).to have_http_status(:created)
         res = JSON.parse(response.body)
         expect(res.keys).to include("child_id", "meeting_slot_id")
