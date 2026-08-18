@@ -137,8 +137,10 @@ RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
 
   # def updateのテスト
   describe "PATCH api_v1_family_unavailability_family_path" do
-    let(:family) { create(:family) }
-    subject { patch(api_v1_family_unavailability_family_path(family.id), headers: headers) }
+     let(:family) { create(:family) }
+      let(:parent_user) { create(:user, role: "parent", family: family) }
+      let(:headers) { auth_headers_for(parent_user) }
+    subject { patch(api_v1_family_unavailability_family_path, headers: headers) }
 
     context "未ログインの場合" do
       let(:headers) { {} }
@@ -146,9 +148,11 @@ RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
     end
 
     context "すでに提出している場合" do
-      let(:family) { create(:family, submitted: true) }
       let(:parent_user) { create(:user, role: "parent") }
       let(:headers) { auth_headers_for(parent_user) }
+      before do
+      parent_user.family.update!(submitted: true)
+      end
 
       it "403が返り、エラーメッセージが返る" do
         subject
@@ -169,5 +173,19 @@ RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
         expect(res["message"]).to eq("提出されました")
       end
     end
+
+    context "他人のfamily_idを混ぜて送った場合" do
+  let(:parent_user) { create(:user, role: "parent") }
+  let(:family_b) { create(:family) }
+  let(:headers) { auth_headers_for(parent_user) }
+  subject do
+    patch(api_v1_family_unavailability_family_path, params: { family_id: family_b.id }, headers: headers)
   end
+  it "自分のfamilyだけが更新され、他人のfamilyは変化しない" do
+    subject
+    expect(parent_user.family.reload.submitted).to eq(true)  # parent_user.familyについて
+    expect(family_b.reload.submitted).to eq(false)  # family_bについて
+  end
+end
+end
 end

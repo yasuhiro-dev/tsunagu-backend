@@ -24,7 +24,7 @@ class Api::V1::FamilyUnavailabilitiesController < ApplicationController
     end
 
   def update
-    family = Family.find(params[:family_id])
+    family = current_user.family
     if family.submitted
         render json: { error: "すでに提出されています" }, status: :forbidden
     else
