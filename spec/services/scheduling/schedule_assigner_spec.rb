@@ -3,7 +3,7 @@ RSpec.describe Scheduling::ScheduleAssigner do
     let(:schedule) { create(:schedule) }
     let(:children) { create(:child) }
     let(:assigner) { described_class.new(schedule, children) }
-    let(:group1) { double("group1") }
+    let(:group1) { [ { child: "child" } ] }
     let(:slots) { [ double("slot") ] }
 
     before do
@@ -13,7 +13,7 @@ RSpec.describe Scheduling::ScheduleAssigner do
     allow(Scheduling::SiblingsFilter).to receive_message_chain(:new, :call).and_return(slots)
     allow(Scheduling::SupportFilter).to receive_message_chain(:new, :call).and_return(slots)
     allow(Scheduling::TimeFilter).to receive_message_chain(:new, :call).and_return(slots)
-    allow(Scheduling::Assigner).to receive_message_chain(:new, :call)
+    allow(Scheduling::Assigner).to receive_message_chain(:new, :call).and_return ([ group1 ])
   end
     context "slotsが存在する場合" do
         it "Assignerを呼び出す" do
