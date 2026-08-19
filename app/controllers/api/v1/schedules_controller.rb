@@ -4,7 +4,9 @@ class Api::V1::SchedulesController < ApplicationController
 
 
     # 管理者が面談日程の割り当てを確定する
+
     def create
+        unassigned = []
         # 2026年度版
         schedule = Schedule.find(params[:id])
         # 2026年度のchildを取得
@@ -17,9 +19,10 @@ class Api::V1::SchedulesController < ApplicationController
         reserved_slots.update_all(status: :available) # 予約を全リセット
         Assignment.where(meeting_slot: meeting_slots).destroy_all # slotを全削除
         # サービスクラスに渡し、調整されて割り当てされる
-        Scheduling::ScheduleAssigner.new(schedule, children).call
+        unassigned_children = Scheduling::ScheduleAssigner.new(schedule, children).call
+        unassigned.concat(unassigned_children)
         end
-        render json: { message: "success" }, status: :ok
+        render json: { message: "success", unassigned_children: unassigned }, status: :ok
         rescue => e
             render json: { error: "割り当てに失敗しました: #{e.message}" }, status: :unprocessable_entity
     end

@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Scheduling::Assigner do
   describe "#call" do
-    it "割り当てが作成される" do
+    it "割り当てされない児童を戻り値として返す" do
       # 準備
       child = create(:child)
       class_room = create(:class_room)
@@ -12,13 +12,13 @@ RSpec.describe Scheduling::Assigner do
       slot = create(:meeting_slot, teacher_id: class_room.teacher_id)
 
       group = [ { type: :normal, child: child } ]
-      slots = [ slot ]
+      slots = []
 
       # 実行
       result = Scheduling::Assigner.new.call(slots, group)
 
       # 検証
-      expect(result).not_to be_empty
+      expect(result).to include(group.first[:child])
     end
   end
 end
