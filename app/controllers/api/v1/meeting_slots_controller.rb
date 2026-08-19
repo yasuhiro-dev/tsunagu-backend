@@ -49,7 +49,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
       slots = MeetingSlot.where(teacher: teacher).includes(assignments: :child)
       # スロットが存在しないなら、面談表を作成する
       if slots.empty?
-        schedule = Schedule.order(created_at: :desc).first
+        schedule = Schedule.current
         existing_slots = MeetingSlot.where(schedule_id: schedule, teacher_id: Teacher.first.id)
         existing_slots.each do |existing_slot|
           MeetingSlot.create!(

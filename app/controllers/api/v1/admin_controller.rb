@@ -114,7 +114,7 @@ class Api::V1::AdminController < ApplicationController
   end
 
   def update_parent
-    schedule = Schedule.order(created_at: :desc).first
+    schedule = Schedule.current
     children = []
     user = User.find(params[:id])
     user.family.update!(name: params[:name])
