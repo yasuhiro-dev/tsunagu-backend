@@ -46,4 +46,9 @@ class Api::V1::SchedulesController < ApplicationController
         # フロント側も情報を更新できるように返す
         render json: { deadline_at: update_schedule }, status: :ok
     end
+    # 今年度のschedule_idをフロントへ返す
+    def current
+    schedule = Schedule.current
+    render json: schedule
+    end
 end
