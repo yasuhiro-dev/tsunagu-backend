@@ -1,5 +1,6 @@
 class Api::V1::ChildrenController<ApplicationController
     before_action -> { authorize_role!("teacher") }
+    # 割り当て児童を取得する
     def index
         teacher = current_user.teacher
         children = Child.includes(:family, :assignments)
@@ -14,7 +15,7 @@ class Api::V1::ChildrenController<ApplicationController
             assigned: c.assignments.any?
             }}, status: :ok
     end
-
+    # 未割り当て児童を取得する
     def unassigned
         teacher = current_user.teacher
         children = Child.includes(:family, :assignments)

@@ -42,25 +42,12 @@ class Api::V1::MeetingSlotsController < ApplicationController
   render json: status
   end
 
-  # 面談表を複製するメソッド
+  # ログイン中の先生の面談表を取得する
   def index
+    # ログイン中のroleが先生の場合
     if current_user.role == "teacher"
       teacher = current_user.teacher
       slots = MeetingSlot.where(teacher: teacher).includes(assignments: :child)
-      # スロットが存在しないなら、面談表を作成する
-      if slots.empty?
-        schedule = Schedule.current
-        existing_slots = MeetingSlot.where(schedule_id: schedule, teacher_id: Teacher.first.id)
-        existing_slots.each do |existing_slot|
-          MeetingSlot.create!(
-            schedule: schedule,
-            teacher: teacher,
-            start_at: existing_slot.start_at,
-            end_at: existing_slot.end_at
-          )
-        end
-        slots = MeetingSlot.where(teacher: teacher).includes(assignments: :child)
-      end
       render json: slots.map { |slot|
         {
           id: slot.id,
@@ -72,6 +59,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
         }
       }
     else
+      # ログイン中のroleが保護者の場合
       family = current_user.family
       assignments = Assignment.joins(:meeting_slot, :child)
                               .where(children: { family: family })
@@ -86,5 +74,29 @@ class Api::V1::MeetingSlotsController < ApplicationController
         }
       }
     end
+  end
+  # ログイン中の先生の面談表を作成する
+  def create
+        schedule = Schedule.current
+        teacher = current_user.teacher
+        existing_slots = MeetingSlot.where(schedule_id: schedule, teacher_id: Teacher.first.id)
+        existing_slots.each do |existing_slot|
+          MeetingSlot.create!(
+            schedule: schedule,
+            teacher: teacher,
+            start_at: existing_slot.start_at,
+            end_at: existing_slot.end_at
+          )
+        end
+        create_meeting_slots = MeetingSlot.where(teacher: teacher).includes(assignments: :child)
+        render json: create_meeting_slots.map { |c|
+      {
+          id: c.id,
+          start_at: c.start_at,
+          end_at: c.end_at,
+          status: c.status,
+          child_name: c.assignments.first&.child&.name,
+          assignment_id: c.assignments.first&.id
+      }}
   end
 end
