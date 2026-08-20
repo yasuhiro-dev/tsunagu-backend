@@ -30,6 +30,5 @@ RSpec.describe Scheduling::TimeFilter do
     expect(subject).to eq []
   end
 end
-
   end
 end

@@ -180,7 +180,7 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
     family.update(submitted: rand < 0.8)
   end
 
-  # 締切（seed実行時から半年後。時間が経っても期限切れにならないように）
+# 締切（seed実行時から半年後。時間が経っても期限切れにならないように）
 schedule.update!(deadline_at: 6.months.from_now)
 
 # 割り当てを実行しておく（二重実行を防ぐため、まだ無いときだけ）
