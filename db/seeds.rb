@@ -39,9 +39,43 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
   end
 end
 
+# デモ用の保護者（兄弟あり＋支援学級あり）
+demo_user = User.find_or_create_by!(email_address: "parent@example.com") do |u|
+  u.password = "password"
+  u.role = "parent"
+  u.role_name = "山田太郎"
+  u.role_name_kana = "やまだたろう"
+end
+demo_family = demo_user.family
+
+# 兄: 5年1組（通常学級のみ）
+demo_older = Child.find_or_create_by!(
+  name: "山田陽向", name_kana: "やまだひなた",
+  family: demo_family, schedule: schedule
+)
+ChildClassRoom.find_or_create_by!(
+  child: demo_older,
+  class_room: ClassRoom.find_by!(grade: 5, section: 1)
+)
+
+# 弟: 1年1組（通常学級）＋ ひまわり（支援学級）
+demo_younger = Child.find_or_create_by!(
+  name: "山田結衣", name_kana: "やまだゆい",
+  family: demo_family, schedule: schedule
+)
+[
+  ClassRoom.find_by!(grade: 1, section: 1),   # 通常学級
+  ClassRoom.find_by!(grade: 0, section: 1)    # ひまわり（支援学級）
+].each do |room|
+  ChildClassRoom.find_or_create_by!(child: demo_younger, class_room: room)
+end
+
+# 提出前の状態にしておく
+demo_family.update!(submitted: false)
+
 teachers = Teacher.all
 # 面談の日程、枠の設定
-start_date = Date.parse("2026-06-01")
+start_date = Date.current + 1.month
 dates = 5.times.map do |i|
   start_date + i
 end
@@ -145,4 +179,12 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
     end
     family.update(submitted: rand < 0.8)
   end
+
+  # 締切（seed実行時から半年後。時間が経っても期限切れにならないように）
+schedule.update!(deadline_at: 6.months.from_now)
+
+# 割り当てを実行しておく（二重実行を防ぐため、まだ無いときだけ）
+if Assignment.none?
+  Scheduling::ScheduleAssigner.new(schedule, Child.where(schedule: schedule)).call
+end
 end
