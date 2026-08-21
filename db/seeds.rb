@@ -99,7 +99,7 @@ end
 
 normal_classes = classes.select { |c|c[6] != :support }
 classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_local, class_name, room_type|
-  target_count= room_type == :support ? 10 : 20
+  target_count= room_type == :support ? 6 : 18
   current_count = 0
   while current_count < target_count
     gimei_last_name = Gimei.last
