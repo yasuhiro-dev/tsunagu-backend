@@ -33,6 +33,36 @@ jobs:
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
+      - name: Run database migration
+        run: |
+          # ECSに、新しい使い捨てタスクを1個起動させる
+          TASK_ARN=$(aws ecs run-task \
+            --cluster tsunagu-cluster \
+            --task-definition tsunagu-backend-task \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[subnet-04aefd65abd1c3c0f,subnet-0264f2f02fd743731],securityGroups=[sg-089607cfa18ad6911],assignPublicIp=ENABLED}" \
+            --overrides '{"containerOverrides":[{"name":"tsunagu-backend","command":["bin/rails","db:migrate"]}]}' \
+            --query 'tasks[0].taskArn' \
+            --output text)
+          echo "Migration task started: $TASK_ARN"
+
+          # migrateが終わるまで、次に進まず待つ
+          aws ecs wait tasks-stopped --cluster tsunagu-cluster --tasks "$TASK_ARN"
+
+          # 終わった後、成功したか失敗したかを確認する
+          EXIT_CODE=$(aws ecs describe-tasks \
+            --cluster tsunagu-cluster \
+            --tasks "$TASK_ARN" \
+            --query 'tasks[0].containers[0].exitCode' \
+            --output text)
+          echo "Migration exit code: $EXIT_CODE"
+
+          # 失敗していたら、ここでCD自体を止める（後続のDeployに進ませない）
+          if [ "$EXIT_CODE" != "0" ]; then
+            echo "Migration failed. Stopping deployment."
+            exit 1
+          fi
+
       - name: Deploy to Amazon ECS
         run: |
           aws ecs update-service \
