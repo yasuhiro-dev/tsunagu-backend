@@ -38,6 +38,8 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems
+# Gemfileだけを先にコピーすることで、アプリコード変更時に
+# bundle installのキャッシュを効かせ、ビルド時間を短縮する
 COPY vendor/* ./vendor/
 COPY Gemfile Gemfile.lock ./
 
@@ -46,7 +48,19 @@ RUN bundle install && \
     # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
     bundle exec bootsnap precompile -j 1 --gemfile
 
+
+# puppeteer(Grover PDF生成用)をインストール
+# package.jsonだけを先にコピーすることで、npm ciのキャッシュを効かせる
+# Chromiumはapt-getで別途インストール済みかつgrover.rbで実行パスを指定しているため、
+# puppeteer自体のChromium自動ダウンロード(あるバージョンから2種類に分離した)はスキップする
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROME_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROME_HEADLESS_SHELL_DOWNLOAD=true
+COPY package.json package-lock.json ./
+RUN npm ci
+
 # Copy application code
+# アプリコードは(gemインストール後の)ここで初めてコピーする
 COPY . .
 
 # Precompile bootsnap code for faster boot times.
