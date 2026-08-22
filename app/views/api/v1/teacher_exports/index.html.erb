@@ -1,21 +1,33 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+
+    <!-- デザインを指定する -->
     <style>
       body {
         font-family: "IPAGothic";
       }
+      /* セルの罫線を「二重線にならず、1本にくっつける」指定 */
       table {
         border-collapse: collapse;
+        table-layout: fixed;
+        width: 100%;
+        height: 80%;
       }
+      /* １マスの枠線と上下左右の間隔を指定 */
       td {
-        border: 1px solid #333;
-        padding: 4px 8px;
+        border: 2px solid #333;
+        padding: 6px 8px;
+        width: 100px;
+        font-size: 18px;
       }
     </style>
   </head>
 
   <body>
+    <h1>2026年個別面談スケジュール</h1>
+    <h2><%= @class_name %> <%= @teacher_name %></h2>
+
     <table>
       <tr>
         <td></td>
@@ -26,8 +38,10 @@
       <% @group_child.each do |time,dates| %>
       <tr>
         <td><%= time %></td>
-        <% dates.each do |date,children| %>
-        <td><%= children.join("、") %></td>
+        <!-- 日付を１つずつ取り出す -->
+        <% @date_list.each do |date| %>
+        <!-- 日付と合致する児童を入れていく -->
+        <td><%= dates[date]&.join("、") %></td>
         <% end %>
       </tr>
       <% end %>
