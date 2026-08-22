@@ -5,8 +5,8 @@ schedule = Schedule.find_or_create_by!(
   year: 2026)
 
 User.find_or_create_by!(email_address: "admin@example.com") do |u|
-  u.password="password"
-  u.role="admin"
+  u.password = "password"
+  u.role = "admin"
 end
 
 classes = [
@@ -39,7 +39,7 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
   end
 end
 
-# デモ用の保護者（兄弟あり＋支援学級あり）
+# デモ用の保護者（兄弟あり＋支援学級あり）※提出済み・割り当て済みを見せる用
 demo_user = User.find_or_create_by!(email_address: "parent@example.com") do |u|
   u.password = "password"
   u.role = "parent"
@@ -64,14 +64,46 @@ demo_younger = Child.find_or_create_by!(
   family: demo_family, schedule: schedule
 )
 [
-  ClassRoom.find_by!(grade: 1, section: 1),   # 通常学級
-  ClassRoom.find_by!(grade: 0, section: 1)    # ひまわり（支援学級）
+  ClassRoom.find_by!(grade: 1, section: 1),
+  ClassRoom.find_by!(grade: 0, section: 1)
 ].each do |room|
   ChildClassRoom.find_or_create_by!(child: demo_younger, class_room: room)
 end
 
-# 提出前の状態にしておく
-demo_family.update!(submitted: false)
+# 提出済みにしておく
+demo_family.update!(submitted: true)
+
+# デモ用の保護者（提出前を見せる用）
+demo_user2 = User.find_or_create_by!(email_address: "parent-nonsubmit@example.com") do |u|
+  u.password = "password"
+  u.role = "parent"
+  u.role_name = "仲田崇"
+  u.role_name_kana = "なかたたけし"
+end
+demo_family2 = demo_user2.family
+
+# 姉：４年1組（通常学級）
+demo_older2 = Child.find_or_create_by!(
+  name: "仲田華歩", name_kana: "なかたかほ",
+  family: demo_family2, schedule: schedule
+)
+ChildClassRoom.find_or_create_by!(
+  child: demo_older2,
+  class_room: ClassRoom.find_by!(grade: 4, section: 1)
+)
+
+# 弟: ３年２組（通常学級）
+demo_younger2 = Child.find_or_create_by!(
+  name: "仲田康浩", name_kana: "なかたやすひろ",
+  family: demo_family2, schedule: schedule
+)
+ChildClassRoom.find_or_create_by!(
+  child: demo_younger2,
+  class_room: ClassRoom.find_by!(grade: 3, section: 2)
+)
+
+# 未提出のままにしておく
+demo_family2.update!(submitted: false)
 
 teachers = Teacher.all
 # 面談の日程、枠の設定
@@ -97,9 +129,9 @@ teachers.each do |teacher|
   end
 end
 
-normal_classes = classes.select { |c|c[6] != :support }
+normal_classes = classes.select { |c| c[6] != :support }
 classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_local, class_name, room_type|
-  target_count= room_type == :support ? 6 : 18
+  target_count = room_type == :support ? 6 : 18
   current_count = 0
   while current_count < target_count
     gimei_last_name = Gimei.last
@@ -130,16 +162,16 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
     family_full_name_kana = family_last_name_kana + gimei_first_name.hiragana
     # Childテーブルに名前と家族情報を入れる
     first_child = Child.find_or_create_by!(name: family_full_name, family: family, name_kana: family_full_name_kana, schedule: schedule)
-      # クラス情報を入れる
-      class_room = ClassRoom.find_by!(
-        grade: grade,
-        section: section
-        )
-      # 子供とクラスの情報を繋げる
-      ChildClassRoom.find_or_create_by!(
-        child: first_child,
-        class_room: class_room
-        )
+    # クラス情報を入れる
+    class_room = ClassRoom.find_by!(
+      grade: grade,
+      section: section
+    )
+    # 子供とクラスの情報を繋げる
+    ChildClassRoom.find_or_create_by!(
+      child: first_child,
+      class_room: class_room
+    )
     current_count += 1
     # 15％の確率で処理を行う
     if rand < 0.15
@@ -149,7 +181,7 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
       siblings_full_name = family_last_name + gimei_siblings_first_name.kanji
       siblings_full_name_kana = family_last_name_kana + gimei_siblings_first_name.hiragana
       # Childテーブルにfamily情報を繋げる
-      sibling_child =Child.find_or_create_by!(name: siblings_full_name, family: family, name_kana: siblings_full_name_kana, schedule: schedule)
+      sibling_child = Child.find_or_create_by!(name: siblings_full_name, family: family, name_kana: siblings_full_name_kana, schedule: schedule)
       classes_sample = normal_classes.sample
       siblings_class_room = ClassRoom.find_by!(
         grade: classes_sample[0],
@@ -158,7 +190,7 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
       ChildClassRoom.find_or_create_by!(
         child: sibling_child,
         class_room: siblings_class_room
-        )
+      )
     end
     # 特別支援の子供の場合、通常学級のクラスも割り当てる
     if room_type == :support
@@ -170,15 +202,16 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
       ChildClassRoom.find_or_create_by!(
         child: first_child,
         class_room: support_class_room
-        )
+      )
     end
     unavailable_slots = MeetingSlot.where(teacher_id: class_room.teacher.id).sample(3)
 
-    unavailability = unavailable_slots.each do |slot|
+    unavailable_slots.each do |slot|
       family.family_unavailabilities.create!(meeting_slot_id: slot.id)
     end
     family.update(submitted: rand < 0.8)
   end
+end
 
 # 締切（seed実行時から半年後。時間が経っても期限切れにならないように）
 schedule.update!(deadline_at: 6.months.from_now)
@@ -186,5 +219,4 @@ schedule.update!(deadline_at: 6.months.from_now)
 # 割り当てを実行しておく（二重実行を防ぐため、まだ無いときだけ）
 if Assignment.none?
   Scheduling::ScheduleAssigner.new(schedule, Child.where(schedule: schedule)).call
-end
 end
