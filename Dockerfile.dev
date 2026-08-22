@@ -12,7 +12,7 @@ WORKDIR /rails
 
 # Install base packages
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 default-libmysqlclient-dev chromium xz-utils build-essential && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 default-libmysqlclient-dev chromium xz-utils build-essential fonts-ipafont-gothic && \
     ARCH=$(case $(uname -m) in aarch64) echo "arm64" ;; x86_64) echo "x64" ;; esac) && \
     curl -fsSL https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-${ARCH}.tar.xz | tar -xJ -C /usr/local --strip-components=1 && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
