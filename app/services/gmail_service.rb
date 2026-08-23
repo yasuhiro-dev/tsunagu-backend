@@ -21,10 +21,12 @@ class GmailService
   end
 
   private
-
+  # アクセストークンが存在していなければ、メッセージを送り中断
   def ensure_valid_token
     raise "この教師はGoogle連携が完了していません" unless @user.google_access_token.present?
+    # トークンの有効期限がまだなら何もしない
     return if @user.google_token_expires_at > Time.now
+    # もし切れているならリフレッシュトークンを渡す
     refresh_access_token
   end
 

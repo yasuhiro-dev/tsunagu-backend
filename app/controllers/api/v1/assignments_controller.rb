@@ -1,9 +1,10 @@
 module Api
   module V1
     class AssignmentsController < ApplicationController
-      # 校内の教員は全員が面談調整に関わるため、担任クラスに関係なく参照可能とする
+      # 先生は全員が面談調整に関わるため、担任クラスに関係なく参照可能とする
       before_action -> { authorize_role!("teacher") }
 
+        # 面談表の＋ボタンから児童を割り当て
         def create
           assignment = Assignment.new(
             meeting_slot_id: params[:meeting_slot_id],
