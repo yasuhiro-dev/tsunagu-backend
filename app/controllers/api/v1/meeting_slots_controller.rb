@@ -3,6 +3,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
   before_action -> { authorize_role!("parent") }, only: [ :all, :blocked_slots ]
   before_action -> { authorize_role!("teacher") }, only: [ :bulk_update ]
 
+  # 割り当て児童やslotの情報を取得する
   def all
     family = current_user.family
     teacher_ids = family.children.flat_map { |child| child.class_rooms.map(&:teacher_id) }
@@ -19,6 +20,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
       }
     }
   end
+
   # 面談不可日程を更新する（教師）
   def bulk_update
     # 面談不可日程（ログイン中の先生別）
@@ -32,7 +34,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
     render json: meeting_slot_blocked, status: :ok
   end
 
-  # 教師の演壇表不可日程を保護者に反映
+  # 教師の面談表不可日程を保護者に反映
   def blocked_slots
     # 現在ログイン中のユーザーからを取得
     family = current_user.family
@@ -47,7 +49,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
     # ログイン中のroleが先生の場合
     if current_user.role == "teacher"
       teacher = current_user.teacher
-      slots = MeetingSlot.where(teacher: teacher).includes(assignments: :child)
+      slots = MeetingSlot.where(teacher: teacher).includes(assignments: { child: :family })
       render json: slots.map { |slot|
         {
           id: slot.id,
@@ -55,7 +57,8 @@ class Api::V1::MeetingSlotsController < ApplicationController
           end_at: slot.end_at,
           status: slot.status,
           child_name: slot.assignments.first&.child&.name,
-          assignment_id: slot.assignments.first&.id
+          assignment_id: slot.assignments.first&.id,
+          submitted: slot.assignments.first&.child&.family&.submitted
         }
       }
     else
