@@ -92,6 +92,7 @@ class Api::V1::SchedulesController < ApplicationController
 
             BODY
           )
+            # 例外により処理を止めないようにrescueを設置
             rescue => e
           Rails.logger.error("[gmail] assignment=#{assignment.id} teacher_user=#{teacher_user&.id} #{e.class}: #{e.message}")
         end
