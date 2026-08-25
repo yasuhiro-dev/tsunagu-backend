@@ -23,13 +23,13 @@ class Api::V1::GoogleAuthController < ApplicationController
     payload = decode_token(params[:state]) # 署名付きトークンが返ってくる
     # 認証されなかった場合
     if payload.nil?
-      return redirect_to "#{ENV['FRONTEND_URL']}/settings?google_connected=false&error=invalid_state"
+      return redirect_to "#{ENV['FRONTEND_URL']}/settings?google_connected=false&error=invalid_state", allow_other_host: true
     end
     # トークン情報からuserをDBから探す
     user = User.find_by(id: payload["user_id"])
     # userが見つからない場合
     if user.nil?
-      return redirect_to "#{ENV['FRONTEND_URL']}/settings?google_connected=false&error=user_not_found"
+      return redirect_to "#{ENV['FRONTEND_URL']}/settings?google_connected=false&error=user_not_found", allow_other_host: true
     end
     # Googleから返ってきた認可コードを取得し、更新する
     token = google_client.auth_code.get_token(
@@ -41,7 +41,7 @@ class Api::V1::GoogleAuthController < ApplicationController
       google_refresh_token: token.refresh_token,
       google_token_expires_at: Time.at(token.expires_at)
     )
-    redirect_to "#{ENV['FRONTEND_URL']}/settings?google_connected=true"
+    redirect_to "#{ENV['FRONTEND_URL']}/settings?google_connected=true", allow_other_host: true
   end
 
   # 現在ログイン中のユーザーがトークンを持っているか確認
