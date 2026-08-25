@@ -57,6 +57,6 @@ class Api::V1::GoogleAuthController < ApplicationController
    end
 
   def callback_url
-    "http://localhost:3000/api/v1/google_auth/callback"
+    "#{ENV['BACKEND_URL']}/api/v1/google_auth/callback"
   end
 end
