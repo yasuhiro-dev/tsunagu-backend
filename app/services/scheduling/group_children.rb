@@ -24,7 +24,7 @@ module Scheduling
 
           child = family_children.first
           # 兄弟がいないかつ特別支援学級の場合
-          if child.class_rooms.any?{|cr|cr.room_type =="support"}
+          if child.class_rooms.any? { |cr|cr.room_type =="support" }
             groups << [
               # 通常級と特別支援学級に分けて管理する
               { child: child, type: :normal },

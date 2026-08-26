@@ -57,5 +57,4 @@ class Api::V1::SchedulesController < ApplicationController
     schedule = Schedule.current
     render json: schedule
     end
-
 end

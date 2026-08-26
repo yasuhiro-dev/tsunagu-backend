@@ -1,8 +1,8 @@
 class AssignmentConfirmationMailJob < ApplicationJob
   queue_as :default
 
-  # Gmail API 側の一時的な失敗（レート制限・ネットワーク断）だけ再試行する。
-  # Google未連携の RuntimeError はここに含めず、即 failed_executions に落として可視化する。
+  # Gmail API 側の一時的な失敗の時だけ再試行する。（最大３回までリトライするたびにだんだん時間が伸びていく）
+  # Google未連携の場合はここに含めず、failed_executions に落として可視化する。
   retry_on OAuth2::Error, Faraday::Error, wait: :polynomially_longer, attempts: 3
 
   def perform(assignment_id)
