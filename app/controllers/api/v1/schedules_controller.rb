@@ -23,10 +23,10 @@ class Api::V1::SchedulesController < ApplicationController
         unassigned_children = Scheduling::ScheduleAssigner.new(schedule, children).call
         unassigned.concat(unassigned_children)
         end
-        # 確認メールを送信する
-        assignments = Assignment.where(meeting_slot: meeting_slots)
-                                .includes(meeting_slot: { teacher: [ :user, :class_rooms ] }, child: { family: :user }) # 今年の面談表だけに絞る
-        assignments.each { |assignment| send_confirmation_email(assignment) }
+        # 確認メールはジョブに逃がす（Gmail APIの直列呼び出しでリクエストが詰まるため）
+        Assignment.where(meeting_slot: meeting_slots).pluck(:id).each do |assignment_id|
+          AssignmentConfirmationMailJob.perform_later(assignment_id)
+        end
 
         render json: { message: "success", unassigned_children: unassigned }, status: :ok
         rescue => e
@@ -58,42 +58,4 @@ class Api::V1::SchedulesController < ApplicationController
     render json: schedule
     end
 
-    private
-        # 面談決定メールのメソッド
-        def send_confirmation_email(assignment)
-          teacher_user = assignment.meeting_slot.teacher.user
-          parent_user = assignment.child.family.user
-          child_name = assignment.child.name
-          teacher_name = teacher_user.teacher.name
-          class_room = teacher_user.teacher.class_rooms.first
-          class_name = class_room.classname
-          GmailService.new(teacher_user).send_email(
-            to: parent_user.email_address,
-            subject: "面談日程のご案内",
-            body: <<~BODY
-             保護者様
-
-            いつもお世話になっております。
-            #{child_name}さんの面談が確定しました。
-
-            【日時】#{assignment.meeting_slot.start_at.strftime('%-m月%-d日 %-H時%M分')}から#{assignment.meeting_slot.end_at.strftime('%-H時%M分')}
-            【場所】#{class_name}
-            【担任】#{teacher_name}
-
-            【準備物】
-            ・上履き
-            ・ネームプレート
-
-            日程の変更をご希望の場合は、
-            学校までお電話にてご連絡ください。
-
-            ---
-            このメールは Tsunagu より自動送信されています。
-
-            BODY
-          )
-            # 例外により処理を止めないようにrescueを設置
-            rescue => e
-          Rails.logger.error("[gmail] assignment=#{assignment.id} teacher_user=#{teacher_user&.id} #{e.class}: #{e.message}")
-        end
 end
