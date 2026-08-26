@@ -10,7 +10,7 @@ module Scheduling
   # room_typeを特別支援と通常級で分ける
   room_type = entry[:type] == :support ? "support" : "normal"
   # 担任（通常級・支援級）の先生を割り出す
-  teacher_id = entry[:child].class_rooms.where(room_type: room_type).first&.teacher_id
+  teacher_id = entry[:child].class_rooms.find { |cr|cr.room_type == room_type }&.teacher_id
   # 面談表と担任の先生を一致させる
   slots.select { |s| s.teacher_id == teacher_id }
 end

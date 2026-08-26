@@ -12,10 +12,12 @@ module Scheduling
     groups = GroupChildren.new(@schedule, @children).call
     # グループごとに優先順位をつける
     sorted_groups = PrioritySort.new.call(groups)
+    # slotの取得を1回で済ませるため、ループの外で作って使い回す
+    available_slots = AvailableSlots.new(@schedule)
       # 優先順位のグループごとに処理する
       sorted_groups.each do |group|
           # 各ファイルで割り当てに関わる制約を確認する
-          slots = AvailableSlots.new(@schedule).call(group)
+          slots = available_slots.call(group)
           slots = TimeFilter.new.call(slots, group)
           slots = SiblingsFilter.new.call(slots, group)
           slots = SupportFilter.new.call(slots, group)

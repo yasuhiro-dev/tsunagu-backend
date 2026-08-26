@@ -4,17 +4,25 @@ module Scheduling
         @schedule = schedule
     end
     # schedule_assignerから呼ばれる
-    # groupから先生を割り出し、先生のidを取得する
+    # groupから先生を割り出し、その先生のslotに絞る
     def call(group)
         teacher_ids = group.map do |g|
             room_type = g[:type] == :support ? "support" : "normal"
-            g[:child].class_rooms.where(room_type: room_type).first&.teacher_id
+            g[:child].class_rooms.detect { |cr| cr.room_type == room_type }&.teacher_id
         end .compact
-        # 2026年度・先生のid・slotが面談可の状態・slotが割り当てられていない状態
-        MeetingSlot.where(schedule: @schedule)
-                   .where(teacher_id: teacher_ids)
-                   .where(status: :available)  # availableなslotに絞る(教師の面談不可への対応：status対応)
-                   .where.not(id: Assignment.select(:meeting_slot_id))
+        # 割り当て済みのslotはAssignerがstatusをreservedに書き換えるので、ここで弾ける
+        all_slots.select { |s| teacher_ids.include?(s.teacher_id) && s.status == "available" }
+    end
+
+    private
+
+    # 全slotの取得はグループをまたいで1回だけ。
+    # グループごとにDBを引くとN+1になり、割り当てが進むほどサブクエリも重くなるため。
+    def all_slots
+        @all_slots ||= MeetingSlot.where(schedule: @schedule)
+                                  .where(status: :available)  # availableなslotに絞る(教師の面談不可への対応：status対応)
+                                  .where.not(id: Assignment.select(:meeting_slot_id))
+                                  .to_a
     end
   end
 end
