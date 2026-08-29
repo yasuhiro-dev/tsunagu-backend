@@ -1,5 +1,7 @@
 class Api::V1::AdminController < ApplicationController
   before_action -> { authorize_role!("admin") }
+  # デモユーザーは削除処理ができない
+  before_action :block_if_demo_user, only: [ :bulk_destroy, :bulk_teacher_destroy, :destroy ]
 
   def index
     teachers = User.where(role: "teacher").includes(teacher: { class_rooms: [] })
@@ -165,4 +167,9 @@ class Api::V1::AdminController < ApplicationController
   def parent_params
     params.require(:user).permit(:email_address, :password)
   end
+  # デモユーザーは削除できない
+  def block_if_demo_user
+  return unless current_user&.demo?
+  render json: { error: "デモアカウントのため、この操作はできません" }, status: :forbidden
+end
 end

@@ -76,6 +76,16 @@ after_create :create_role_record
     google_access_token
     end
 
+    DEMO_EMAILS = %w[
+      aoki@example.com
+      parent@example.com
+      parent-nonsubmit@example.com
+      admin@example.com
+    ].freeze
+
+    def demo?
+      DEMO_EMAILS.include?(email_address)
+    end
 
 
 private
