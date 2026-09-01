@@ -35,34 +35,32 @@ gem "image_processing", "~> 1.2"
 gem "rack-cors"
 
 group :development, :test do
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
+  # デバッグ系
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
-
-  # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
-  gem "bundler-audit", require: false
-
-  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
-  gem "brakeman", require: false
-
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
-  gem "rubocop-rails-omakase", require: false
-end
-
-group :development, :test do
   gem "pry-byebug"
   gem "pry-doc"
   gem "pry-rails"
+  # 品質チェック系
+  gem "bundler-audit", require: false
+  gem "brakeman", require: false
+  gem "rubocop-rails-omakase", require: false
+  # テスト系
   gem "rspec-rails"
   gem "factory_bot_rails"
 end
-gem "faker"
 
+group :development do
+  # ER図を書くため
+  gem "rails-erd"
+end
+# デモアカウント生成
+gem "faker"
 gem "gimei"
 
 gem "jwt"
 
 gem "mysql2"
-
+# google認証
 gem "oauth2"
-
+# PDF生成
 gem "grover"
