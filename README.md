@@ -1,24 +1,30 @@
-# README
+# Tsunagu Backend
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+[Tsunagu](https://github.com/yasuhiro-dev/tsunagu) のバックエンド（Rails 8 API）です。
 
-Things you may want to cover:
+学校の個人面談日程を自動調整するサービスで、兄弟の連続配置や特別支援学級との調整といった制約を踏まえたスケジューリングアルゴリズムを実装しています。
 
-* Ruby version
+プロジェクト全体の背景・設計判断・画面・インフラ構成などの詳細は、[メインリポジトリのREADME](https://github.com/yasuhiro-dev/tsunagu)を参照してください。
 
-* System dependencies
+## セットアップ（開発環境の起動）
 
-* Configuration
+このリポジトリには `docker-compose.yml` を含んでいません。開発環境は [tsunagu](https://github.com/yasuhiro-dev/tsunagu)（親リポジトリ）のDocker Compose構成を使って起動してください。
 
-* Database creation
+```bash
+# コンテナ起動
+docker compose up -d
 
-* Database initialization
+# DB作成・マイグレーション
+docker compose exec rails_container rails db:create db:migrate
 
-* How to run the test suite
+# テスト実行
+docker compose exec rails_container bundle exec rspec
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+## 技術スタック
 
-* Deployment instructions
-
-* ...
+- Rails 8（APIモード）
+- MySQL
+- JWT認証
+- RSpec / FactoryBot
+- Brakeman
