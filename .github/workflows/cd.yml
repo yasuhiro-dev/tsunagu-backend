@@ -40,7 +40,7 @@ jobs:
             --cluster tsunagu-cluster \
             --task-definition tsunagu-backend-task \
             --launch-type FARGATE \
-            --network-configuration "awsvpcConfiguration={subnets=[subnet-04aefd65abd1c3c0f,subnet-0264f2f02fd743731],securityGroups=[sg-089607cfa18ad6911],assignPublicIp=ENABLED}" \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ secrets.SUBNET_ID_1 }},${{ secrets.SUBNET_ID_2 }}],securityGroups=[${{ secrets.SG_ID }}],assignPublicIp=ENABLED}" \
             --overrides '{"containerOverrides":[{"name":"tsunagu-backend","command":["bin/rails","db:migrate"]}]}' \
             --query 'tasks[0].taskArn' \
             --output text)
