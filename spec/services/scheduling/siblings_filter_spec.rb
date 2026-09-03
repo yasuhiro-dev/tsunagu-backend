@@ -57,5 +57,31 @@ RSpec.describe Scheduling::SiblingsFilter do
         expect(subject).to eq []
       end
     end
+    context "本人が2枠必要(通常級+支援級)で、間に兄弟の枠が挟まる場合" do
+  let(:child_b1) { create(:child, family: family_a) } # 通常級+支援級の両方が必要な子
+  let(:child_b2) { create(:child, family: family_a) } # 通常級のみの兄弟
+
+  let(:slot2) { create(:meeting_slot, start_at: slot1.start_at + 15.minutes) } # 兄弟(通常級)
+  let(:slot3) { create(:meeting_slot, start_at: slot1.start_at + 30.minutes) } # 本人(支援級)
+  let(:slots) { [ slot1, slot2, slot3 ] }
+
+  let(:group) do
+    [
+      { child: child_b1, type: :normal },   # 本人・通常級 → slot1
+      { child: child_b2, type: :normal },   # 兄弟         → slot2
+      { child: child_b1, type: :support }   # 本人・支援級 → slot3
+    ]
+  end
+
+  before do
+    child_b1.class_rooms << create(:class_room, room_type: 0, teacher: slot1.teacher)
+    child_b2.class_rooms << create(:class_room, room_type: 0, teacher: slot2.teacher)
+    child_b1.class_rooms << create(:class_room, room_type: 1, teacher: slot3.teacher)
+  end
+
+  it "本人の2枠が隣接していないので、空のslotを返す" do
+    expect(subject).to eq []
+  end
+end
   end
 end

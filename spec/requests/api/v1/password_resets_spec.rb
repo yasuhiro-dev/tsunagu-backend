@@ -13,11 +13,23 @@ RSpec.describe "Api::V1::PasswordResets", type: :request do
     end
     context "トークン生成に失敗する場合" do
       before { user.update_column(:role, nil) }
-      it_behaves_like "成功する", :unprocessable_entity
+      it_behaves_like "成功する", :ok
     end
+    # 登録の有無をレスポンスから判別できないようにしている（ユーザー列挙の防止）
     context "メールアドレスが一致していない場合" do
       subject { post(api_v1_password_resets_path, params: { password_reset: { email: "notfound@example.com" } }) }
-      it_behaves_like "成功する", :not_found
+      it_behaves_like "成功する", :ok
+
+      it "登録済みの場合とレスポンスが区別できない" do
+        subject
+        unknown = [ response.status, response.body ]
+        post(api_v1_password_resets_path, params: { password_reset: { email: user.email_address } })
+        expect([ response.status, response.body ]).to eq(unknown)
+      end
+
+      it "メールは送信されない" do
+        expect { subject }.not_to change { ActionMailer::Base.deliveries.size }
+      end
     end
   end
 
