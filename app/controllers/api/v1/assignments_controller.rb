@@ -95,7 +95,6 @@ module Api
             subject: "面談が確定しました",
             body: "#{assignment.child.name}さんの面談は#{assignment.meeting_slot.start_at.strftime('%-m月%-d日 %-H時%-M分')}からです。")
             rescue => e
-               p "エラー詳細: #{e.message}"
           Rails.logger.error("メール送信に失敗しました: #{e.message}")
         end
     end

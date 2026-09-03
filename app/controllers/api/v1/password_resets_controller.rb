@@ -2,20 +2,15 @@ class Api::V1::PasswordResetsController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :create, :update ]
   # メソッド全体の役割:リクエストで送られたメールアドレスからUserを特定し、新しいトークンを作成しメールを送信する
   def create
-    @user = User.find_by(email_address: params[:password_reset][:email].downcase)
-    if @user
-        # @user.create_reset_digestがバリデーションで成功したか判断する時の分岐
-        if @user.create_reset_digest
-           @user.send_password_reset_email
-           render json: { message: "メールを送信しました" }, status: :ok
-        else
-          render json: { message: "メール送信に失敗しました" }, status: :unprocessable_entity
-        end
-    else
-        # Userが見つからない時の処理
-        render json: { message: "メール送信に失敗しました" }, status: :not_found
-    end
+  @user = User.find_by(email_address: params[:password_reset][:email].downcase)
+  if @user
+    @user.create_reset_digest
+    @user.send_password_reset_email
   end
+  # ユーザーの有無に関わらず、常に同じレスポンスを返す
+  # （メールアドレスの登録有無を外部から判別できないようにするため）
+  render json: { message: "登録されているメールアドレスの場合、リセット用のメールを送信しました" }, status: :ok
+end
 
   # メソッド全体の役割:トークンの照合によってユーザーを特定して、パスワードを更新するメソッド
   def update
