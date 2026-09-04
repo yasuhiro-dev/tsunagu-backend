@@ -111,6 +111,9 @@ start_date = Date.current + 1.month
 dates = 5.times.map do |i|
   start_date + i
 end
+# 締切（面談開始日の2週間前に設定)
+schedule.update!(deadline_at: start_date - 2.week)
+
 # 面談の時間設定
 teachers.each do |teacher|
   dates.each do |date|
@@ -213,8 +216,7 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
   end
 end
 
-# 締切（seed実行時から半年後。時間が経っても期限切れにならないように）
-schedule.update!(deadline_at: 6.months.from_now)
+
 
 # 割り当てを実行しておく（二重実行を防ぐため、まだ無いときだけ）
 if Assignment.none?
