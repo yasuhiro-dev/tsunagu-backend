@@ -70,8 +70,10 @@ class Api::V1::MeetingSlotsController < ApplicationController
       render json: assignments.map { |a|
         {
           id: a.id,
+          child_id: a.child.id,
           child_name: a.child.name,
           class_name: a.meeting_slot.teacher.class_rooms.first.classname,
+          room_type: a.meeting_slot.teacher.class_rooms.first.room_type,
           start_at: a.meeting_slot.start_at,
           end_at: a.meeting_slot.end_at
         }
