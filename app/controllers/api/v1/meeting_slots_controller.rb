@@ -67,6 +67,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
       assignments = Assignment.joins(:meeting_slot, :child)
                               .where(children: { family: family })
                               .includes(:child, meeting_slot: { teacher: :class_rooms })
+                              .order("meeting_slots.start_at")
       render json: assignments.map { |a|
         {
           id: a.id,
