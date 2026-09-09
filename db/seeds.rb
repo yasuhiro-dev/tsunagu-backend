@@ -222,3 +222,7 @@ end
 if Assignment.none?
   Scheduling::ScheduleAssigner.new(schedule, Child.where(schedule: schedule)).call
 end
+# 未割り当て児童を２人作る
+class1_children = Child.joins(:class_rooms).where(class_rooms: { classname: "1年1組" }).distinct
+sample = class1_children.sample(2)
+sample.each { |c|Assignment.find_by(child_id: c.id)&.destroy }
