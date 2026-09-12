@@ -32,7 +32,7 @@ module Api
 
           # 時間の制約（familyモデルでメソッド管理）
           family = child.family
-          unavailable_start_at = family.family_unavailability_start_at # 関連づけられるためにfamilyを取得してから
+          unavailable_start_at = family.unavailable_start_at # 関連づけられるためにfamilyを取得してから
 
           # 兄弟関係の面談表(childモデルでメソッド管理)
           siblings = child.siblings

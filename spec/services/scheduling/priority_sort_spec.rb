@@ -43,7 +43,7 @@ RSpec.describe Scheduling::PrioritySort do
       ]
       end
       before do
-        create(:family_unavailability, family: child_b1.family)
+        child_b1.family.update!(submitted: true)
       end
       it "先頭に来る" do
         expect(subject.first).to eq groups[1]
@@ -57,7 +57,7 @@ RSpec.describe Scheduling::PrioritySort do
             ]
         end
         before do
-            create(:family_unavailability, family: child_a1.family)
+            child_a1.family.update!(submitted: true)
         end
         it "先頭に来る" do
             expect(subject.first). to eq groups[0]

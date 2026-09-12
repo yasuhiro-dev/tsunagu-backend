@@ -1,25 +1,25 @@
-class Api::V1::FamilyUnavailabilitiesController < ApplicationController
+class Api::V1::FamilyAvailabilitiesController < ApplicationController
     before_action -> { authorize_role!("parent") }
 
     def index
         family = current_user.family
-        unavailabilities = family.family_unavailabilities.pluck(:meeting_slot_id)
-        render json: unavailabilities, status: :ok
+        availabilities = family.family_availabilities.pluck(:meeting_slot_id)
+        render json: availabilities, status: :ok
     end
 
     def create
         family = current_user.family
-        unavailability = family.family_unavailabilities.create!(
+        availability = family.family_availabilities.create!(
             meeting_slot_id: params[:meeting_slot_id]
         )
-        render json: unavailability, status: :created
+        render json: availability, status: :created
     end
     def destroy
         family = current_user.family
-        unavailabilities = family.family_unavailabilities.find_by!(
+        availability = family.family_availabilities.find_by!(
              meeting_slot_id: params[:meeting_slot_id]
         )
-       unavailabilities.destroy!
+       availability.destroy!
        render json: { message: "delete" }, status: :ok
     end
 
@@ -27,6 +27,9 @@ class Api::V1::FamilyUnavailabilitiesController < ApplicationController
     family = current_user.family
     if family.submitted
         render json: { error: "すでに提出されています" }, status: :forbidden
+    elsif family.family_availabilities.none?
+        # 参加できる日時が0件だと、どの枠にも割り当てられないため
+        render json: { error: "参加できる日時を1つ以上選んでください" }, status: :unprocessable_entity
     else
        family.update(submitted: true)
        render json: { message: "提出されました" }, status: :ok

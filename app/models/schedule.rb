@@ -3,7 +3,7 @@ class Schedule < ApplicationRecord
   has_many :meeting_slots
 
   has_many :families, through: :children
-  has_many :family_unavailabilities, through: :meeting_slots
+  has_many :family_availabilities, through: :meeting_slots
 
   # 今年度の計算
   def self.current_year
