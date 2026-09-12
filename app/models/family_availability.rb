@@ -1,4 +1,4 @@
-class FamilyUnavailability < ApplicationRecord
+class FamilyAvailability < ApplicationRecord
   belongs_to :family
   belongs_to :meeting_slot
   validate :check_deadline

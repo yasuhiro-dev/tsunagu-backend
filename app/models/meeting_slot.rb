@@ -2,7 +2,7 @@ class MeetingSlot < ApplicationRecord
   belongs_to :teacher
   belongs_to :schedule
   has_many :assignments, dependent: :destroy
-  has_many :family_unavailabilities, dependent: :destroy
+  has_many :family_availabilities, dependent: :destroy
 
   enum :status, { available: 0, reserved: 1, blocked: 2 }
 end

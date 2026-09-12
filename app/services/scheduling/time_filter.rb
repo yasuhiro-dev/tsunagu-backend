@@ -1,15 +1,17 @@
 module Scheduling
   class TimeFilter
     def call(slots, group)
-      # 保護者の割り当て不可日のstart_atを取得する
+      # 提出済みの家庭は、参加できると答えた時刻の枠だけを残す
       # （idではなく時刻で見ることで兄弟間で不具合が起こらない）
+      # 未提出の家庭は、途中まで入力していても制約なしとして扱う
+      families = group.map { |g| g[:child].family }.uniq.select(&:submitted)
+      return slots if families.empty?
+
       # 事前ロード済みのmeeting_slotを辿るだけにして、グループごとのクエリをなくす
-      start_at = group.map { |g| g[:child] }
-                      .flat_map { |child| child.family.family_unavailabilities.map { |item| item.meeting_slot&.start_at } }
-                      .compact
-                      .uniq
-      # 全slotを見て、不可日slotと比較し、被っていたらを弾く（start_at）
-      slots.reject { |s| start_at.include?(s.start_at) }
+      available_start_at = families.map do |family|
+        family.family_availabilities.map { |item| item.meeting_slot&.start_at }.compact
+      end
+      slots.select { |s| available_start_at.all? { |start_at| start_at.include?(s.start_at) } }
     end
   end
 end

@@ -1,9 +1,9 @@
 require "rails_helper"
 
-RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
+RSpec.describe "Api::V1::FamilyAvailabilities", type: :request do
   # def indexのテスト
-  describe "GET api_v1_family_unavailabilities_path" do
-    subject { get(api_v1_family_unavailabilities_path, headers: headers) }
+  describe "GET api_v1_family_availabilities_path" do
+    subject { get(api_v1_family_availabilities_path, headers: headers) }
 
     context "未ログインの場合" do
       let(:headers) { {} }
@@ -15,9 +15,9 @@ RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
       let(:parent_user) { create(:user, role: "parent", family: family) }
       let(:headers) { auth_headers_for(parent_user) }
       let(:meeting_slot) { create(:meeting_slot) }
-      let!(:family_unavailability) { create(:family_unavailability, family: family, meeting_slot: meeting_slot) }
+      let!(:family_availability) { create(:family_availability, family: family, meeting_slot: meeting_slot) }
 
-      it "200が返り、familyの日程不可のmeeting_slotを取得する" do
+      it "200が返り、familyの参加できるmeeting_slotを取得する" do
         subject
         expect(response).to have_http_status(:ok)
         res = JSON.parse(response.body)
@@ -47,9 +47,9 @@ RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
   end
 
   # def createのテスト
-  describe "POST api_v1_family_unavailabilities_path" do
+  describe "POST api_v1_family_availabilities_path" do
     let(:meeting_slot) { create(:meeting_slot) }
-    subject { post(api_v1_family_unavailabilities_path, params: { meeting_slot_id: meeting_slot.id }, headers: headers) }
+    subject { post(api_v1_family_availabilities_path, params: { meeting_slot_id: meeting_slot.id }, headers: headers) }
 
     context "未ログインの場合" do
       let(:headers) { {} }
@@ -61,7 +61,7 @@ RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
       let(:parent_user) { create(:user, role: "parent", family: family) }
       let(:headers) { auth_headers_for(parent_user) }
 
-      it "200が返り、familyの日程不可のmeeting_slotを作成する" do
+      it "200が返り、familyの参加できるmeeting_slotを作成する" do
         subject
         expect(response).to have_http_status(:created)
         res = JSON.parse(response.body)
@@ -91,9 +91,9 @@ RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
   end
 
   # def destroyのテスト
-  describe "DELETE api_v1_family_unavailability_meeting_slot_path" do
+  describe "DELETE api_v1_family_availability_meeting_slot_path" do
     let(:meeting_slot) { create(:meeting_slot) }
-    subject { delete(api_v1_family_unavailability_meeting_slot_path(meeting_slot.id), headers: headers) }
+    subject { delete(api_v1_family_availability_meeting_slot_path(meeting_slot.id), headers: headers) }
 
     context "未ログインの場合" do
       let(:headers) { {} }
@@ -104,9 +104,9 @@ RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
       let(:family) { create(:family) }
       let(:parent_user) { create(:user, role: "parent", family: family) }
       let(:headers) { auth_headers_for(parent_user) }
-      let!(:family_unavailability) { create(:family_unavailability, family: family, meeting_slot: meeting_slot) }
+      let!(:family_availability) { create(:family_availability, family: family, meeting_slot: meeting_slot) }
 
-      it "200が返り、familyの日程不可のmeeting_slotを削除する" do
+      it "200が返り、familyの参加できるmeeting_slotを削除する" do
         subject
         expect(response).to have_http_status(:ok)
         res = JSON.parse(response.body)
@@ -136,11 +136,11 @@ RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
   end
 
   # def updateのテスト
-  describe "PATCH api_v1_family_unavailability_family_path" do
+  describe "PATCH api_v1_family_availability_family_path" do
      let(:family) { create(:family) }
       let(:parent_user) { create(:user, role: "parent", family: family) }
       let(:headers) { auth_headers_for(parent_user) }
-    subject { patch(api_v1_family_unavailability_family_path, headers: headers) }
+    subject { patch(api_v1_family_availability_family_path, headers: headers) }
 
     context "未ログインの場合" do
       let(:headers) { {} }
@@ -165,8 +165,9 @@ RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
     context "提出されていない場合" do
       let(:parent_user) { create(:user, role: "parent") }
       let(:headers) { auth_headers_for(parent_user) }
+      before { create(:family_availability, family: parent_user.family) }
 
-      it "200が返り、日程不可の日程が更新される" do
+      it "200が返り、提出済みになる" do
         subject
         expect(response).to have_http_status(:ok)
         res = JSON.parse(response.body)
@@ -174,12 +175,24 @@ RSpec.describe "Api::V1::FamilyUnavailabilities", type: :request do
       end
     end
 
+    context "参加できる日時を1つも選んでいない場合" do
+      let(:parent_user) { create(:user, role: "parent") }
+      let(:headers) { auth_headers_for(parent_user) }
+
+      it "422が返り、提出されない" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(parent_user.family.reload.submitted).to eq(false)
+      end
+    end
+
     context "他人のfamily_idを混ぜて送った場合" do
   let(:parent_user) { create(:user, role: "parent") }
   let(:family_b) { create(:family) }
   let(:headers) { auth_headers_for(parent_user) }
+  before { create(:family_availability, family: parent_user.family) }
   subject do
-    patch(api_v1_family_unavailability_family_path, params: { family_id: family_b.id }, headers: headers)
+    patch(api_v1_family_availability_family_path, params: { family_id: family_b.id }, headers: headers)
   end
   it "自分のfamilyだけが更新され、他人のfamilyは変化しない" do
     subject

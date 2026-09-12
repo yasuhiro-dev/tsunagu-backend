@@ -5,10 +5,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
 
   # 割り当て児童やslotの情報を取得する
   def all
-    family = current_user.family
-    teacher_ids = family.children.flat_map { |child| child.class_rooms.map(&:teacher_id) }
-    slots = MeetingSlot.where(teacher_id: teacher_ids).includes(assignments: :child)
-    slots = slots.group_by(&:start_at).map { |_, s| s.first }
+    slots = current_user.family.selectable_slots
 
     render json: slots.map { |slot|
       {
@@ -21,17 +18,21 @@ class Api::V1::MeetingSlotsController < ApplicationController
     }
   end
 
-  # 面談不可日程を更新する（教師）
+  # 面談できる日時を更新する（教師）
+  # 送られてきた枠を面談可、それ以外の枠を面談不可にする
   def bulk_update
-    # 面談不可日程（ログイン中の先生別）
-    meeting_slot_blocked = MeetingSlot.where(id: params[:meeting_slot_ids], teacher_id: current_user.teacher.id)
+    teacher_slots = MeetingSlot.where(teacher_id: current_user.teacher.id)
+    available_ids = Array(params[:meeting_slot_ids]).map(&:to_i)
     # reservedにblockを上書きしないバリデーション
-    if meeting_slot_blocked.any? { |slot|slot.reserved? }
-      render json: { error: "予約済みに保護者が含まれています" }, status: :unprocessable_entity
+    if teacher_slots.where.not(id: available_ids).exists?(status: :reserved)
+      render json: { error: "予約済みの枠は面談不可にできません" }, status: :unprocessable_entity
       return
     end
-    meeting_slot_blocked.update_all(status: :blocked)
-    render json: meeting_slot_blocked, status: :ok
+    ActiveRecord::Base.transaction do
+      teacher_slots.where(id: available_ids, status: :blocked).update_all(status: :available)
+      teacher_slots.where.not(id: available_ids).where(status: :available).update_all(status: :blocked)
+    end
+    render json: teacher_slots, status: :ok
   end
 
   # 教師の面談表不可日程を保護者に反映

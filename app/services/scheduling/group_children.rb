@@ -8,7 +8,7 @@ module Scheduling
     # schedule_assignerから呼ばれる
     def call
       groups = []
-      children = @children.where(schedule_id: @schedule.id).includes(:class_rooms, family: { family_unavailabilities: :meeting_slot })
+      children = @children.where(schedule_id: @schedule.id).includes(:class_rooms, family: { family_availabilities: :meeting_slot })
       # family_idで兄弟を判断する
       siblings = children.group_by(&:family_id)
       # 兄弟を判断するデータ・複数児童をまとめた箱に分けて管理

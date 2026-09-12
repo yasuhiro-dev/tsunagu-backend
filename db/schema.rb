@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_07_111808) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_11_000000) do
   create_table "assignments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "child_id"
     t.datetime "created_at", null: false
@@ -61,13 +61,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_111808) do
     t.bigint "user_id"
   end
 
-  create_table "family_unavailabilities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "family_availabilities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "family_id"
     t.bigint "meeting_slot_id"
     t.datetime "updated_at", null: false
-    t.index ["family_id"], name: "index_family_unavailabilities_on_family_id"
-    t.index ["meeting_slot_id"], name: "index_family_unavailabilities_on_meeting_slot_id"
+    t.index ["family_id"], name: "index_family_availabilities_on_family_id"
+    t.index ["meeting_slot_id"], name: "index_family_availabilities_on_meeting_slot_id"
   end
 
   create_table "meeting_slots", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -241,8 +241,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_111808) do
   add_foreign_key "children", "families"
   add_foreign_key "children", "schedules"
   add_foreign_key "class_rooms", "teachers"
-  add_foreign_key "family_unavailabilities", "families"
-  add_foreign_key "family_unavailabilities", "meeting_slots"
+  add_foreign_key "family_availabilities", "families"
+  add_foreign_key "family_availabilities", "meeting_slots"
   add_foreign_key "meeting_slots", "schedules"
   add_foreign_key "meeting_slots", "teachers"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

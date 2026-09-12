@@ -132,6 +132,11 @@ teachers.each do |teacher|
   end
 end
 
+# 提出済みのデモ保護者は、全ての時刻に参加できる状態にしておく
+demo_family.selectable_slots.each do |slot|
+  demo_family.family_availabilities.find_or_create_by!(meeting_slot: slot)
+end
+
 normal_classes = classes.select { |c| c[6] != :support }
 classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_local, class_name, room_type|
   target_count = room_type == :support ? 6 : 18
@@ -207,11 +212,12 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
         class_room: support_class_room
       )
     end
-    unavailable_slots = MeetingSlot.where(teacher_id: class_room.teacher.id).sample(3)
-
-    unavailable_slots.each do |slot|
-      family.family_unavailabilities.create!(meeting_slot_id: slot.id)
-    end
+    # 担任の枠からランダムに3コマを参加できない時刻とし、残りを参加できる時刻として登録する
+    selectable_slots = family.selectable_slots
+    unavailable_slots = selectable_slots.sample(3)
+    FamilyAvailability.insert_all(
+      (selectable_slots - unavailable_slots).map { |slot| { family_id: family.id, meeting_slot_id: slot.id } }
+    )
     family.update(submitted: rand < 0.8)
   end
 end
