@@ -212,23 +212,25 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
         class_room: support_class_room
       )
     end
-    # 担任の枠からランダムに3コマを参加できない時刻とし、残りを参加できる時刻として登録する
-    selectable_slots = family.selectable_slots
-    unavailable_slots = selectable_slots.sample(3)
+    isSubmitted = rand < 0.9
+    # 80%の確率で submitted: true（提出済み）に更新
+    family.update(submitted: isSubmitted)
+    # もしsubmitted: true（提出済み）の場合
+    if isSubmitted
+    selectable_slots = family.selectable_slots # その家族が選べるslot
+    available_slots = selectable_slots.sample(20) # 参加できる時間を20コマ選ぶ
     FamilyAvailability.insert_all(
-      (selectable_slots - unavailable_slots).map { |slot| { family_id: family.id, meeting_slot_id: slot.id } }
+      available_slots.map { |slot| { family_id: family.id, meeting_slot_id: slot.id } }
     )
-    family.update(submitted: rand < 0.8)
+    end
   end
 end
-
-
 
 # 割り当てを実行しておく（二重実行を防ぐため、まだ無いときだけ）
 if Assignment.none?
   Scheduling::ScheduleAssigner.new(schedule, Child.where(schedule: schedule)).call
+  # 未割り当て児童を２人作る
+  class1_children = Child.joins(:class_rooms).where(class_rooms: { classname: "1年1組" }).distinct
+  sample = class1_children.sample(2)
+  sample.each { |c|Assignment.find_by(child_id: c.id)&.destroy }
 end
-# 未割り当て児童を２人作る
-class1_children = Child.joins(:class_rooms).where(class_rooms: { classname: "1年1組" }).distinct
-sample = class1_children.sample(2)
-sample.each { |c|Assignment.find_by(child_id: c.id)&.destroy }
