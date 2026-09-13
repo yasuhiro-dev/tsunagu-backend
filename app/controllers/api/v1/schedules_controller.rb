@@ -28,7 +28,7 @@ class Api::V1::SchedulesController < ApplicationController
           AssignmentConfirmationMailJob.perform_later(assignment_id)
         end
 
-        render json: { message: "success", unassigned_children: unassigned }, status: :ok
+        render json: { message: "success", unassigned_children: unassigned.as_json(include: :class_rooms) }, status: :ok
         rescue => e
             render json: { error: "割り当てに失敗しました: #{e.message}" }, status: :unprocessable_entity
     end
