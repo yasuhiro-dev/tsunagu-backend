@@ -108,8 +108,11 @@ demo_family2.update!(submitted: false)
 teachers = Teacher.all
 # 面談の日程、枠の設定
 start_date = Date.current + 1.month
-dates = 5.times.map do |i|
-  start_date + i
+dates = []                 # 平日を入れていく空の配列
+current = start_date       # 今見ている日（最初は1か月後）
+while dates.size < 5       # 5日分たまるまで繰り返す
+  dates << current unless current.on_weekend?   # 土日でなければ配列に足す
+  current += 1                                   # 次の日へ進む
 end
 # 締切（面談開始日の2週間前に設定)
 schedule.update!(deadline_at: start_date - 2.week)
@@ -213,7 +216,7 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
       )
     end
     isSubmitted = rand < 0.9
-    # 80%の確率で submitted: true（提出済み）に更新
+    # 90%の確率で submitted: true（提出済み）に更新
     family.update(submitted: isSubmitted)
     # もしsubmitted: true（提出済み）の場合
     if isSubmitted
@@ -227,10 +230,10 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
 end
 
 # 割り当てを実行しておく（二重実行を防ぐため、まだ無いときだけ）
-if Assignment.none?
-  Scheduling::ScheduleAssigner.new(schedule, Child.where(schedule: schedule)).call
-  # 未割り当て児童を２人作る
-  class1_children = Child.joins(:class_rooms).where(class_rooms: { classname: "1年1組" }).distinct
-  sample = class1_children.sample(2)
-  sample.each { |c|Assignment.find_by(child_id: c.id)&.destroy }
-end
+# if Assignment.none?
+#   Scheduling::ScheduleAssigner.new(schedule, Child.where(schedule: schedule)).call
+#   # 未割り当て児童を２人作る
+#   class1_children = Child.joins(:class_rooms).where(class_rooms: { classname: "1年1組" }).distinct
+#   sample = class1_children.sample(2)
+#   sample.each { |c|Assignment.find_by(child_id: c.id)&.destroy }
+# end
