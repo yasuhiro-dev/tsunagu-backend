@@ -89,7 +89,7 @@ RSpec.describe "Api::V1::Children", type: :request do
       it "担任クラスの名前が class_names に入る" do
         subject
         res = JSON.parse(response.body)
-        expect(res["class_names"]).to eq([class_room.classname])
+        expect(res["class_names"]).to eq([ class_room.classname ])
       end
     end
 
