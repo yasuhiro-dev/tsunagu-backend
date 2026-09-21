@@ -67,13 +67,13 @@ RSpec.describe "Api::V1::Children", type: :request do
 
     context "teacherでログインしている場合" do
       # 現在ログイン中のteacherを作り、headersへ
-      let(:teacher) { create(:teacher) }
-      let(:teacher_user) { create(:user, role: "teacher", teacher: teacher) }
-      let(:headers) { auth_headers_for(teacher_user) }
+      let!(:teacher) { create(:teacher) }
+      let!(:teacher_user) { create(:user, role: "teacher", teacher: teacher) }
+      let!(:headers) { auth_headers_for(teacher_user) }
       # teacherが所属するclass_roomを作る
       let(:class_room) { create(:class_room, teacher: teacher) }
       # 児童を作る
-      let(:child) { create(:child) }
+      let!(:child) { create(:child) }
       # 児童に作成したクラスを当てはめる
       before do
         child.class_rooms << class_room
@@ -83,8 +83,13 @@ RSpec.describe "Api::V1::Children", type: :request do
         subject
         expect(response).to have_http_status(:ok)
         res = JSON.parse(response.body)
-        # 配列のためfirstで１件だけ取得
-        expect(res.first.keys).to include("id", "child_name", "family_name")
+        # children は配列のため、first で1件だけ取得
+        expect(res["children"].first.keys).to include("id", "child_name", "family_name")
+      end
+      it "担任クラスの名前が class_names に入る" do
+        subject
+        res = JSON.parse(response.body)
+        expect(res["class_names"]).to eq([ class_room.classname ])
       end
     end
 

@@ -3,17 +3,21 @@ class Api::V1::ChildrenController<ApplicationController
     # 割り当て児童を取得する
     def index
         teacher = current_user.teacher
+        class_rooms = teacher.class_rooms
         children = Child.includes(:family, :assignments)
-        .joins(:child_class_rooms)
-        .where(child_class_rooms: { class_room_id: teacher.class_room_ids })
-        render json: children.map { |c| {
-            id: c.id,
-            child_name: c.name,
-            child_name_kana: c.name_kana,
-            family_name: c.family.name,
-            submitted: c.family.submitted,
-            assigned: c.assignments.any?
-            }}, status: :ok
+                        .joins(:child_class_rooms)
+                        .where(child_class_rooms: { class_room_id: teacher.class_room_ids })
+        render json: {
+        class_names: class_rooms.pluck(:classname),
+        children: children.map { |c| {
+        id: c.id,
+        child_name: c.name,
+        child_name_kana: c.name_kana,
+        family_name: c.family.name,
+        submitted: c.family.submitted,
+        assigned: c.assignments.any?
+        } }
+    }, status: :ok
     end
     # 未割り当て児童を取得する
     def unassigned
