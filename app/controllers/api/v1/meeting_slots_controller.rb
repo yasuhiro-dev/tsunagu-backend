@@ -41,7 +41,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
     family = current_user.family
     class_rooms = family.children.flat_map { |c|c.class_rooms }
     teacher = class_rooms.map { |r|r.teacher }
-    status = teacher.flat_map { |t|t.meeting_slots.where(status: :blocked) }
+    status = teacher.flat_map { |t|t.meeting_slots.where(status: :blocked) } # statusをblockedに絞ったmeeting_slotsを全て返す
   render json: status
   end
 

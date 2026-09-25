@@ -43,6 +43,7 @@ Rails.application.routes.draw do
       get "/google_auth/status", to: "google_auth#status"
       post "/google_calendar/:id", to: "google_calendar#create"
       get "/teacher_exports", to: "teacher_exports#index"
+      get "/teachers/capacity", to: "teachers#capacity"
     end
   end
 end

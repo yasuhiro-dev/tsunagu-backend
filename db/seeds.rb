@@ -82,23 +82,23 @@ demo_user2 = User.find_or_create_by!(email_address: "parent-nonsubmit@example.co
 end
 demo_family2 = demo_user2.family
 
-# 姉：４年1組（通常学級）
-demo_older2 = Child.find_or_create_by!(
+# 妹：1年1組（通常学級）
+demo_younger2 = Child.find_or_create_by!(
   name: "仲田華歩", name_kana: "なかたかほ",
   family: demo_family2, schedule: schedule
 )
 ChildClassRoom.find_or_create_by!(
-  child: demo_older2,
-  class_room: ClassRoom.find_by!(grade: 4, section: 1)
+  child: demo_younger2,
+  class_room: ClassRoom.find_by!(grade: 1, section: 1)
 )
 
-# 弟: ３年２組（通常学級）
-demo_younger2 = Child.find_or_create_by!(
+# 兄: ３年２組（通常学級）
+demo_older2 = Child.find_or_create_by!(
   name: "仲田康浩", name_kana: "なかたやすひろ",
   family: demo_family2, schedule: schedule
 )
 ChildClassRoom.find_or_create_by!(
-  child: demo_younger2,
+  child: demo_older2,
   class_room: ClassRoom.find_by!(grade: 3, section: 2)
 )
 

@@ -36,11 +36,23 @@ module Api
 
           # 兄弟関係の面談表(childモデルでメソッド管理)
           siblings = child.siblings
-          siblings_meeting_schedule = siblings.map { |sibling|sibling.related_schedules }
+          siblings_meeting_schedule = siblings.map { |sibling|sibling.related_schedules } # 面談表を取得している
+
+          # 兄弟の時刻を取得する
+          siblings_start_at = siblings.flat_map { |sibling|sibling.assignments.map { |a|a.meeting_slot&.start_at } }.compact
+
+          # 特別支援の時刻を取得する
+          own_support_start_at = child.assignments
+                                      .where.not(id: assignment.id) # 現在選んでいるassignmentは含めない
+                                      .map { |a|a.meeting_slot&.start_at }.compact
 
           # 特別支援の面談表
           own_support_meeting_schedule = child.related_schedules
-          render json: { unavailable_start_at: unavailable_start_at, siblings_meeting_schedule: siblings_meeting_schedule, own_support_meeting_schedule: own_support_meeting_schedule }, status: :ok
+          render json: { unavailable_start_at: unavailable_start_at,
+                          siblings_meeting_schedule: siblings_meeting_schedule,
+                          own_support_meeting_schedule: own_support_meeting_schedule,
+                          siblings_start_at: siblings_start_at,
+                          own_support_start_at: own_support_start_at }, status: :ok
         end
 
         # 面談編集メソッド
