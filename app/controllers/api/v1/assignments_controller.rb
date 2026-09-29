@@ -16,9 +16,7 @@ module Api
               # statusをreservedに変更する
               assignment.meeting_slot.update!(status: "reserved")
           end
-          # 確認メールを送信する
-          send_confirmation_email(assignment)
-          render json: assignment, status: :created
+
 
         rescue => e
           render json: { error: "予約に失敗しました: #{e.message}" }, status: :unprocessable_entity
@@ -96,19 +94,6 @@ module Api
           rescue => e
             render json: { error: "割り当ての修正に失敗しました: #{e.message}" }, status: :unprocessable_entity
           end
-
-        private
-        # 面談決定メールのメソッド
-        def send_confirmation_email(assignment)
-          teacher_user = assignment.meeting_slot.teacher.user
-          parent_user = assignment.child.family.user
-          GmailService.new(teacher_user).send_email(
-            to: parent_user.email_address,
-            subject: "面談が確定しました",
-            body: "#{assignment.child.name}さんの面談は#{assignment.meeting_slot.start_at.strftime('%-m月%-d日 %-H時%-M分')}からです。")
-            rescue => e
-          Rails.logger.error("メール送信に失敗しました: #{e.message}")
-        end
     end
   end
 end

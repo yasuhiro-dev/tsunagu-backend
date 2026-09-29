@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_11_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_26_012503) do
+  create_table "assignment_notifications", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "child_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "meeting_slot_id", null: false
+    t.datetime "sent_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["child_id", "meeting_slot_id"], name: "index_assignment_notifications_on_child_id_and_meeting_slot_id", unique: true
+    t.index ["child_id"], name: "index_assignment_notifications_on_child_id"
+    t.index ["meeting_slot_id"], name: "index_assignment_notifications_on_meeting_slot_id"
+  end
+
   create_table "assignments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "child_id"
     t.datetime "created_at", null: false
@@ -234,6 +245,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_000000) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "assignment_notifications", "children"
+  add_foreign_key "assignment_notifications", "meeting_slots"
   add_foreign_key "assignments", "children"
   add_foreign_key "assignments", "meeting_slots"
   add_foreign_key "child_class_rooms", "children"
