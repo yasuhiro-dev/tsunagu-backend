@@ -1,11 +1,12 @@
 class AssignmentNotifier
-  # 未通知ユーザーを集める
   def unnotified_assignment
+    # 通知済みユーザー
     notified = AssignmentNotification.pluck(:child_id, :meeting_slot_id)
-    Assignment.includes(
+    # 割り当て＋未通知ユーザーを集める
+    Assignment.includes( # 割り当て済みのものを読む
       meeting_slot: { teacher: [ :user, :class_rooms ] },
       child: { family: :user }
-    ).select do |assignment|
+    ).select do |assignment| # その中から、未通知のものだけ残す
       assignment_pair = [ assignment.child_id, assignment.meeting_slot_id ]
       !notified.include?(assignment_pair)
     end

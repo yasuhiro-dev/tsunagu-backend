@@ -16,10 +16,9 @@ module Api
               # statusをreservedに変更する
               assignment.meeting_slot.update!(status: "reserved")
           end
-
-
+          render json: { meeting_slot_id: assignment.meeting_slot_id, child_id: assignment.child_id }, status: :created
         rescue => e
-          render json: { error: "予約に失敗しました: #{e.message}" }, status: :unprocessable_entity
+          render json: { error: "割り当てに失敗しました: #{e.message}" }, status: :unprocessable_entity
       end
 
         # バリデーション表示（時間の制約・兄弟/特別支援面談表の取得）
