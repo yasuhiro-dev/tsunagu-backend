@@ -44,6 +44,8 @@ Rails.application.routes.draw do
       post "/google_calendar/:id", to: "google_calendar#create"
       get "/teacher_exports", to: "teacher_exports#index"
       get "/teachers/capacity", to: "teachers#capacity"
+      post "/assignment_notifications", to: "assignment_notifications#create"
+      get "/assignment_notifications", to: "assignment_notifications#index"
     end
   end
 end

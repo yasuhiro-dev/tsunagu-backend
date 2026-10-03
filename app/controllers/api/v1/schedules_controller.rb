@@ -23,11 +23,6 @@ class Api::V1::SchedulesController < ApplicationController
         unassigned_children = Scheduling::ScheduleAssigner.new(schedule, children).call
         unassigned.concat(unassigned_children)
         end
-        # 確認メールはジョブに逃がす（Gmail APIの直列呼び出しでリクエストが詰まるため）
-        Assignment.where(meeting_slot: meeting_slots).pluck(:id).each do |assignment_id|
-          AssignmentConfirmationMailJob.perform_later(assignment_id)
-        end
-
         render json: { message: "success", unassigned_children: unassigned.as_json(include: :class_rooms) }, status: :ok
         rescue => e
             render json: { error: "割り当てに失敗しました: #{e.message}" }, status: :unprocessable_entity

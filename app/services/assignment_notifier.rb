@@ -1,68 +1,77 @@
-# 保護者へ面談確定メールを送る
-#
-# 送信済みかどうかは assignment_notifications テーブルで管理する。
-# 一括割り当てをやり直しても、同じ児童が同じ枠に入っていれば再送しない。
-# 面談表でコマを移動した児童は meeting_slot_id が変わるため、自動的に再送の対象になる。
 class AssignmentNotifier
-  Result = Struct.new(:sent_count, :failed_count, keyword_init: true)
-
-  def initialize(schedule)
-    @schedule = schedule
+  def unnotified_assignment
+    # 通知済みユーザー
+    notified = AssignmentNotification.pluck(:child_id, :meeting_slot_id)
+    # 割り当て＋未通知ユーザーを集める
+    Assignment.includes( # 割り当て済みのものを読む
+      meeting_slot: { teacher: [ :user, :class_rooms ] },
+      child: { family: :user }
+    ).select do |assignment| # その中から、未通知のものだけ残す
+      assignment_pair = [ assignment.child_id, assignment.meeting_slot_id ]
+      !notified.include?(assignment_pair)
+    end
   end
 
-  def call
-    sent_count = 0
-    failed_count = 0
-
-    unnotified_assignments.each do |assignment|
-      # 1人分の失敗で全体を止めない。
-      # 担任がGoogle未連携の場合、そのクラスだけ落ちて他のクラスには届く。
-      # 失敗した児童は未通知のまま残るので、もう一度ボタンを押せば再送される。
+  # 送信する
+  def call(dry_run: false)
+    unnotified_assignment.each do |assignment| # unnotified_assignmentメソッドを呼ぶ
       begin
-        send_mail(assignment)
+        send_mail(assignment) unless dry_run # dry_runがfalse(本番)のときだけ送信する
+
+        # 送らなくても通知済みにする(デモ用も通知済みになる)
         AssignmentNotification.create!(
           child_id: assignment.child_id,
           meeting_slot_id: assignment.meeting_slot_id,
           sent_at: Time.current
         )
-        sent_count += 1
-      rescue => e
-        Rails.logger.error("面談確定メールの送信に失敗しました (assignment_id: #{assignment.id}): #{e.message}")
-        failed_count += 1
+      rescue OAuth2::Error, Faraday::Error # Gmail通信のエラー
+        raise # call の呼び出し元(perform)へ飛ぶ
+      rescue => e # Gmail通信とは関係のない、予期しない種類のエラー
+        Rails.logger.error("通知送信エラー: assignment_id=#{assignment.id} #{e.message}")
+        next
       end
     end
-
-    Result.new(sent_count: sent_count, failed_count: failed_count)
   end
 
-  # まだ通知していない割り当て
-  def unnotified_assignments
-    # 学校規模（数百件）なのでRuby側で突き合わせる
-    notified = AssignmentNotification.pluck(:child_id, :meeting_slot_id).to_set
+  # コントローラーの未送信ユーザーが0の場合のバリデーションで使用
+  def unnotified_assignment_count
+    unnotified_assignment.count
+  end
 
-    assignments.reject { |assignment|
-      notified.include?([ assignment.child_id, assignment.meeting_slot_id ])
-    }
+  # 送信済みユーザーの表示に使用
+  def notified_count
+    AssignmentNotification.count
+  end
+
+  # 全ユーザーの数
+  def all_user_count
+    unnotified_assignment_count + notified_count
+  end
+
+  # 未送信ユーザー情報(保護者・児童・クラス・担当教諭)を取得
+  def unnotified_details
+    unnotified_assignment.map do |assignment| # 未通知のユーザーのみ取得
+      parent_name = assignment.child.family.name # 保護者名
+      child_name = assignment.child.name # 児童名
+      teacher_user = assignment.meeting_slot.teacher.user
+      teacher_name = teacher_user.teacher.name # 教師名
+      class_name = teacher_user.teacher.class_rooms.first&.classname # クラス名
+      { parent_name: parent_name, child_name: child_name, teacher_name: teacher_name, class_name: class_name }
+    end
   end
 
   private
 
-  def assignments
-    Assignment.where(meeting_slot: @schedule.meeting_slots)
-              .includes(
-                meeting_slot: { teacher: [ :user, :class_rooms ] },
-                child: { family: :user }
-              )
-  end
-
+  # 1件分の面談確定メールを、担任のGmailアカウントから送る
   def send_mail(assignment)
     teacher_user = assignment.meeting_slot.teacher.user
-    parent_user  = assignment.child.family.user
-    teacher      = teacher_user.teacher
-    class_name   = teacher.class_rooms.first&.classname
+    teacher = teacher_user.teacher
+    class_name = teacher.class_rooms.first&.classname
+    parent_user = assignment.child.family.user
+    parent_user_mail = parent_user.email_address
 
     GmailService.new(teacher_user).send_email(
-      to: parent_user.email_address,
+      to: parent_user_mail,
       subject: "面談日程のご案内",
       body: <<~BODY
         保護者様
@@ -70,7 +79,7 @@ class AssignmentNotifier
         いつもお世話になっております。
         #{assignment.child.name}さんの面談が確定しました。
 
-        【日時】#{assignment.meeting_slot.start_at.strftime('%-m月%-d日 %-H時%M分')}から#{assignment.meeting_slot.end_at.strftime('%-H時%M分')}
+        【日時】#{assignment.meeting_slot.start_at.strftime('%-m月%-d日 %-H時%-M分')}から#{assignment.meeting_slot.end_at.strftime('%-H時%-M分')}
         【場所】#{class_name}
         【担任】#{teacher.name}
 
@@ -82,7 +91,7 @@ class AssignmentNotifier
         学校までお電話にてご連絡ください。
 
         ---
-        このメールは Tsunagu（面談日程調整システム）より、担任のアカウントで送信されています。
+        このメールは Tsunagu(面談日程調整システム)より、担任のアカウントで送信されています。
       BODY
     )
   end

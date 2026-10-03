@@ -6,7 +6,7 @@ class GmailService
   def initialize(user)
     @user = user
   end
-  #
+
   def send_email(to:, subject:, body:)
     # トークンがあるか確認する
     ensure_valid_token
