@@ -21,7 +21,7 @@ before_action :set_notifier # 先にメソッドを定義
     def index
         # 未送信ユーザーの数
         unnotified_count = @notifier.unnotified_assignment_count
-        # 　送信済みユーザー数
+        # 送信済みユーザー数
         notified_count = @notifier.notified_count
         # 送信ユーザー＋未送信ユーザーの数
         all_user_count = @notifier.all_user_count

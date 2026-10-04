@@ -2,10 +2,10 @@ class AssignmentNotifier
   def unnotified_assignment
     # 通知済みユーザー
     notified = AssignmentNotification.pluck(:child_id, :meeting_slot_id)
-    # 割り当て＋未通知ユーザーを集める
-    Assignment.includes( # 割り当て済みのものを読む
-      meeting_slot: { teacher: [ :user, :class_rooms ] },
-      child: { family: :user }
+    # 全割り当てを集める
+    Assignment.includes(
+    meeting_slot: { teacher: [ :user, :class_rooms ] },
+    child: { family: :user }
     ).select do |assignment| # その中から、未通知のものだけ残す
       assignment_pair = [ assignment.child_id, assignment.meeting_slot_id ]
       !notified.include?(assignment_pair)
@@ -33,19 +33,19 @@ class AssignmentNotifier
     end
   end
 
-  # コントローラーの未送信ユーザーが0の場合のバリデーションで使用
+  # 未通知ユーザーの表示/未通知ユーザーが0の場合のバリデーションで使用
   def unnotified_assignment_count
     unnotified_assignment.count
   end
 
-  # 送信済みユーザーの表示に使用
+  # 通知済みユーザーの表示に使用（割り当て全体　ー　未通知　＝　通知）
   def notified_count
-    AssignmentNotification.count
+   all_user_count - unnotified_assignment_count
   end
 
-  # 全ユーザーの数
+  # 全ユーザーの数(割り当てされている数)
   def all_user_count
-    unnotified_assignment_count + notified_count
+    Assignment.count
   end
 
   # 未送信ユーザー情報(保護者・児童・クラス・担当教諭)を取得
