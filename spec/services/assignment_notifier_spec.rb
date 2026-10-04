@@ -82,9 +82,18 @@ RSpec.describe AssignmentNotifier do
           child: notified.child)
     end
     context "送信済ユーザーの数が呼ばれた場合" do
-      it "送信済ユーザーの数を返す" do
+      it "全体-未通知ユーザー=送信済ユーザーを返す" do
         expect(subject).to eq(1)
       end
+    end
+    context "通知後に面談枠を入れ替えた場合" do
+    before do
+      notified.update!(meeting_slot: create(:meeting_slot)) # 新しい枠(通知記録の組と一致しない)
+    end
+
+    it "入れ替えた面談は、未通知に戻る" do
+      expect(subject).to eq(0)
+    end
     end
     end
     describe "#all_user_count" do
@@ -97,9 +106,18 @@ RSpec.describe AssignmentNotifier do
           child: notified.child)
     end
     context "全ユーザー数を呼ばれた場合" do
-      it "未通知ユーザーの数＋通知ユーザーの数を返す" do
+      it "割り当て済みの面談の総数を返す" do
         expect(subject).to eq(2)
       end
+    end
+    context "通知後に面談枠を入れ替えた場合" do
+    before do
+      notified.update!(meeting_slot: create(:meeting_slot)) # 新しい枠(通知記録の組と一致しない)
+    end
+
+    it "履歴が残っていても、割り当ての総数のまま" do
+      expect(subject).to eq(2)
+    end
     end
     end
     describe "#unnotified_details" do
