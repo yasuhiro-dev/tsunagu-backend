@@ -33,6 +33,34 @@ RSpec.describe "Api::V1::Children", type: :request do
         # 配列のためfirstで１件だけ取得
         expect(res.first.keys).to include("id", "child_name", "family_name")
       end
+
+      context "保護者が参加できる日時を提出している場合" do
+        let(:later) { Time.zone.parse("2026-11-18 16:15") }
+        let(:earlier) { Time.zone.parse("2026-11-17 15:00") }
+        let!(:later_slot) { create(:meeting_slot, teacher: teacher, start_at: later, end_at: later + 15.minutes) }
+        let!(:earlier_slot) { create(:meeting_slot, teacher: teacher, start_at: earlier, end_at: earlier + 15.minutes) }
+        before do
+          create(:family_availability, family: child.family, meeting_slot: later_slot)
+          create(:family_availability, family: child.family, meeting_slot: earlier_slot)
+          child.family.update!(submitted: true)
+        end
+
+        it "提出済みであることと、参加できる時刻が早い順に渡る" do
+          subject
+          res = JSON.parse(response.body)
+          expect(res.first["submitted"]).to eq(true)
+          expect(res.first["available_start_at"].map { |t| Time.zone.parse(t) }).to eq([ earlier, later ])
+        end
+      end
+
+      context "保護者が未提出の場合" do
+        it "未提出であることと、空の時刻が渡る" do
+          subject
+          res = JSON.parse(response.body)
+          expect(res.first["submitted"]).to eq(false)
+          expect(res.first["available_start_at"]).to eq([])
+        end
+      end
     end
 
     context "teacherではない場合(parent)" do

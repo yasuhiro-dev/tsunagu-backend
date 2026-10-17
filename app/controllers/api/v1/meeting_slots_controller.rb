@@ -59,7 +59,8 @@ class Api::V1::MeetingSlotsController < ApplicationController
           status: slot.status,
           child_name: slot.assignments.first&.child&.name,
           assignment_id: slot.assignments.first&.id,
-          submitted: slot.assignments.first&.child&.family&.submitted
+          submitted: slot.assignments.first&.child&.family&.submitted,
+          class_room: teacher.class_rooms.first&.classname
         }
       }
     else

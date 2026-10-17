@@ -46,6 +46,7 @@ Rails.application.routes.draw do
       get "/teachers/capacity", to: "teachers#capacity"
       post "/assignment_notifications", to: "assignment_notifications#create"
       get "/assignment_notifications", to: "assignment_notifications#index"
+      post "/demo/reset", to: "demo#reset"
     end
   end
 end
