@@ -221,13 +221,16 @@ classes.each do |grade, section, teacher_name, teacher_name_kana, teacher_email_
     # もしsubmitted: true（提出済み）の場合
     if isSubmitted
     selectable_slots = family.selectable_slots # その家族が選べるslot
-    available_slots = selectable_slots.sample(20) # 参加できる時間を20コマ選ぶ
+    available_slots = selectable_slots.sample(25) # 参加できる時間を20コマ選ぶ
     FamilyAvailability.insert_all(
       available_slots.map { |slot| { family_id: family.id, meeting_slot_id: slot.id } }
     )
     end
   end
 end
+
+# 自動割り当てで入らない児童（手動割り当てのデモ用）
+load Rails.root.join("db/seeds/demo_unassigned_children.rb")
 
 # 割り当てを実行しておく（二重実行を防ぐため、まだ無いときだけ）
 # if Assignment.none?
