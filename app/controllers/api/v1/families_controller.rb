@@ -9,7 +9,13 @@ class Api::V1::FamiliesController < ApplicationController
       render json: { error: "Unauthorized" }, status: :unauthorized
       return
     end
+    # 児童の名前とクラスの情報を取得
+    children = family.children.includes(:class_rooms).map { |c|
+                {
+                  name: c.name,
+                  classroom: c.class_rooms.map { |cr|cr.classname }
+                }}
     # adminとteacherは取得可能
-    render json: { submitted: family.submitted }, status: :ok
+    render json: { submitted: family.submitted, children: children }, status: :ok
   end
 end
