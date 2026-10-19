@@ -42,6 +42,7 @@ class Api::V1::AssignmentStatsController < ApplicationController
     unassigned_children = Child.where.not(id: assigned_ids).includes(:class_rooms)
 
     render json: {
+      siblings_stats: siblings_stats,
       class_rates: class_rates,
       all_rates: all_rates,
       assign_count: assign_count,
@@ -49,5 +50,23 @@ class Api::V1::AssignmentStatsController < ApplicationController
       total_count: total_count,
       unassigned_children: unassigned_children.as_json(include: :class_rooms)
     }, status: :ok
+  end
+
+  private
+  def siblings_stats
+    siblings_family = Family.includes(children: { assignments: :meeting_slot }).select { |f|f.children.length >= 2 } # 兄弟を持つ家族にしぼる(判定がtrueのものだけ残る)
+    # 割り当てられている兄弟を持つ家庭のうち連続しての数を数える
+    success = siblings_family.count do |family|
+      next false if family.children.any? { |c|c.assignments.empty? } # 割り当てられていない子がいたら失敗
+      date = family.children.flat_map { |c| c.assignments }.map { |a| a.meeting_slot.start_at.to_date }
+      next false if date.uniq.size > 1 # 同じ日付がない場合、失敗
+      times = family.children
+              .flat_map { |c| c.assignments }
+              .map { |a| a.meeting_slot.start_at }
+              .sort # 割り当てられている時刻を並び替える
+      next false unless times.each_cons(2).all? { |t1, t2| t2 == t1 + 15.minutes } # 連続していない場合、失敗
+      true
+    end
+    { total: siblings_family.length, success: success }
   end
 end
