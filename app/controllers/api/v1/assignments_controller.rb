@@ -79,7 +79,8 @@ module Api
             end
             end
             # フロントの受け取りの型がMeetingSlotなのでその型に合わせてrenderする
-            slots = MeetingSlot.where(teacher: current_user.teacher).includes(assignments: :child)
+            teacher = current_user.teacher
+            slots = MeetingSlot.where(teacher: teacher).includes(assignments: :child)
             render json: slots.map { |slot|
               {
                 id: slot.id,
@@ -87,7 +88,8 @@ module Api
                 end_at: slot.end_at,
                 status: slot.status,
                 child_name: slot.assignments.first&.child&.name,
-                assignment_id: slot.assignments.first&.id
+                assignment_id: slot.assignments.first&.id,
+                class_room: teacher.class_rooms.first&.classname
               }
             }
           rescue => e

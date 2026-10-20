@@ -6,7 +6,6 @@ class Api::V1::MeetingSlotsController < ApplicationController
   # 割り当て児童やslotの情報を取得する
   def all
     slots = current_user.family.selectable_slots
-
     render json: slots.map { |slot|
       {
         id: slot.id,
@@ -61,6 +60,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
           assignment_id: slot.assignments.first&.id,
           submitted: slot.assignments.first&.child&.family&.submitted,
           class_room: teacher.class_rooms.first&.classname
+
         }
       }
     else
