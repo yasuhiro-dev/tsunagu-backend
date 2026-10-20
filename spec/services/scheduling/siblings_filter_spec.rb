@@ -4,7 +4,7 @@ RSpec.describe Scheduling::SiblingsFilter do
 
     let(:family_a) { create(:family) }
     let(:child_a1) { create(:child, family: family_a) }
-    let(:slot1) { create(:meeting_slot) }
+    let(:slot1) { create(:meeting_slot, start_at: Time.zone.parse("2026-11-10 15:00")) }
     let(:slots) { [ slot1 ] }
     let(:group) { [ { child: child_a1, type: :normal } ] }
 
