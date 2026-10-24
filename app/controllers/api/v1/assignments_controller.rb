@@ -13,7 +13,7 @@ module Api
           ActiveRecord::Base.transaction do
               # 割り当てられた場合、保存される
               assignment.save!
-              # statusをreservedに変更する
+              # statusをreservedに変更する(slotがblockedじゃない場合)
               assignment.meeting_slot.update!(status: "reserved")
           end
           render json: { meeting_slot_id: assignment.meeting_slot_id, child_id: assignment.child_id }, status: :created
@@ -70,9 +70,11 @@ module Api
                 to_assignment.update!(meeting_slot_id: from_slot_id)
             else
               # 移動先（B）にいない場合(A→□)
-              from_assignment.meeting_slot.update!(status: "available")
+              from_slot = from_assignment.meeting_slot
+              from_slot.update!(status: "available") if from_slot.reserved?
               # 移動先（B）にはまだいないのでMeetingslotから変更
-              MeetingSlot.find(to_slot_id).update!(status: "reserved")
+              to_slot =MeetingSlot.find(to_slot_id)
+              to_slot.update!(status: "reserved") if to_slot.available?
             end
             # 移動元（A）の児童を、移動先の場所へ変更する（A→B）
             from_assignment.update!(meeting_slot_id: to_slot_id)
@@ -80,16 +82,20 @@ module Api
             end
             # フロントの受け取りの型がMeetingSlotなのでその型に合わせてrenderする
             teacher = current_user.teacher
-            slots = MeetingSlot.where(teacher: teacher).includes(assignments: :child)
+            slots = MeetingSlot.where(teacher: teacher).includes(assignments: { child: :family })
+            class_room_name = teacher.class_rooms.first&.classname
             render json: slots.map { |slot|
+            assignment =  slot.assignments.first
+            child = assignment&.child
               {
                 id: slot.id,
                 start_at: slot.start_at,
                 end_at: slot.end_at,
                 status: slot.status,
-                child_name: slot.assignments.first&.child&.name,
-                assignment_id: slot.assignments.first&.id,
-                class_room: teacher.class_rooms.first&.classname
+                child_name: child&.name,
+                assignment_id: assignment&.id,
+                class_room: class_room_name,
+                submitted: child&.family&.submitted
               }
             }
           rescue => e
