@@ -60,26 +60,34 @@ class AssignmentNotifier
     end
   end
 
-  private
+  # 　メールプレビューで使用するメソッド
+  def demo_preview_bodies
+    family = User.find_by(email_address: DemoResetter::DEMO_PARENT_EMAIL)&.family
+    return [] unless family
 
-  # 1件分の面談確定メールを、担任のGmailアカウントから送る
-  def send_mail(assignment)
-    teacher_user = assignment.meeting_slot.teacher.user
-    teacher = teacher_user.teacher
+    Assignment.where(child: family.children)
+              .joins(:meeting_slot)
+              .order("meeting_slots.start_at") # 時刻をもとに並び直すだけ
+              .map { |assignment| mail_body(assignment) } # 呼び出したassignmentを引数に渡して、メールの本文が完成する
+  end
+
+  # 面談確定メールの件名
+  def mail_subject
+   "面談日程のご案内"
+  end
+
+  # 面談確定メールの本文（送信とプレビューで同じものを使う）
+  def mail_body(assignment)
+    teacher = assignment.meeting_slot.teacher
     class_name = teacher.class_rooms.first&.classname
-    parent_user = assignment.child.family.user
-    parent_user_mail = parent_user.email_address
 
-    GmailService.new(teacher_user).send_email(
-      to: parent_user_mail,
-      subject: "面談日程のご案内",
-      body: <<~BODY
+      <<~BODY
         保護者様
 
         いつもお世話になっております。
         #{assignment.child.name}さんの面談が確定しました。
 
-        【日時】#{assignment.meeting_slot.start_at.strftime('%-m月%-d日 %-H時%-M分')}から#{assignment.meeting_slot.end_at.strftime('%-H時%-M分')}
+        【日時】#{assignment.meeting_slot.start_at.strftime('%-m月%-d日 %-H時%M分')}から#{assignment.meeting_slot.end_at.strftime('%-H時%M分')}
         【場所】#{class_name}
         【担任】#{teacher.name}
 
@@ -90,11 +98,25 @@ class AssignmentNotifier
         日程の変更をご希望の場合は、
         学校までお電話にてご連絡ください。
 
-
-
         ---
         このメールは Tsunagu(面談日程調整システム)より、担任のアカウントで送信されています。
       BODY
+  end
+
+
+
+  private
+
+  # 1件分の面談確定メールを、担任のGmailアカウントから送る
+  def send_mail(assignment)
+    teacher_user = assignment.meeting_slot.teacher.user
+    parent_user = assignment.child.family.user
+    parent_user_mail = parent_user.email_address
+
+    GmailService.new(teacher_user).send_email(
+      to: parent_user_mail,
+      subject: mail_subject,
+      body: mail_body(assignment)
     )
   end
 end

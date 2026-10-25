@@ -39,7 +39,10 @@ before_action :set_notifier # 先にメソッドを定義
             unnotified_count: unnotified_count,
             unlinked_teachers: unlinked_teachers,
             all_user_count: all_user_count,
-            unnotified_details: unnotified_details
+            unnotified_details: unnotified_details,
+            demo_mode: current_user.demo?,
+            mail_subject: @notifier.mail_subject,
+            mail_body: current_user.demo? ? @notifier.demo_preview_bodies : []
         }, status: :ok
     end
 
