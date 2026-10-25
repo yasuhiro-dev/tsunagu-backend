@@ -28,5 +28,8 @@ module MeetingApp
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # 画像の加工（Active Storageのvariant）は使わないため、image_processing gemなしで起動できるよう無効にする
+    config.active_storage.variant_processor = :disabled
   end
 end
