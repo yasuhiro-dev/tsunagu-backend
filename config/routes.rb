@@ -47,6 +47,9 @@ Rails.application.routes.draw do
       post "/assignment_notifications", to: "assignment_notifications#create"
       get "/assignment_notifications", to: "assignment_notifications#index"
       post "/demo/reset", to: "demo#reset"
+      post "/demo/prepare_guest", to: "demo#prepare_guest"
+      post "/demo/assign", to: "demo#assign"
+      post "/demo/reassign", to: "demo#reassign"
     end
   end
 end
