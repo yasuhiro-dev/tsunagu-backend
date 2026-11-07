@@ -38,4 +38,11 @@ class Api::V1::ChildrenController<ApplicationController
             available_start_at: c.family.family_availabilities.map { |a| a.meeting_slot&.start_at }.compact.uniq.sort
         }}, status: :ok
     end
+
+        # バリデーション表示（時間の制約・兄弟/特別支援面談表の取得）
+        def valid_slots
+          # フロントからURLに載せて１つのassignment_idを取得
+          child = Child.find(params[:id])
+          render json: child.valid_slots_data, status: :ok
+        end
 end

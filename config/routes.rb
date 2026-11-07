@@ -32,6 +32,7 @@ Rails.application.routes.draw do
       resources :families, only: :show, as: "family"
       get "child_list", to: "children#index"
       get "/children/unassigned", to: "children#unassigned"
+      get "/children/:id/valid_slots", to: "children#valid_slots"
       post "/password_resets", to: "password_resets#create"
       patch "/password_resets/:token", to: "password_resets#update", as: "password_resets_token"
       get "/assignment_stats", to: "assignment_stats#index"
