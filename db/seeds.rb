@@ -74,12 +74,14 @@ end
 demo_family.update!(submitted: true)
 
 # デモ用の保護者（提出前を見せる用）
-demo_user2 = User.find_or_create_by!(email_address: "parent-nonsubmit@example.com") do |u|
-  u.password = "password"
-  u.role = "parent"
-  u.role_name = "仲田崇"
-  u.role_name_kana = "なかたたけし"
-end
+demo_user2 = User.find_or_initialize_by(email_address: "parent-nonsubmit@example.com")
+demo_user2.assign_attributes(
+  password: "password",
+  role: "parent",
+  role_name: "仲田美咲",
+  role_name_kana: "なかたみさき"
+)
+demo_user2.save!
 demo_family2 = demo_user2.family
 
 # 妹：1年1組（通常学級）
