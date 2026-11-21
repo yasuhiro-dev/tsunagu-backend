@@ -8,7 +8,7 @@
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=3.3.10
+ARG RUBY_VERSION=3.3.14
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -16,7 +16,7 @@ WORKDIR /rails
 
 # Install base packages
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 default-libmysqlclient-dev chromium xz-utils fonts-ipafont-gothic && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 default-libmysqlclient-dev chromium xz-utils fonts-ipafont-gothic git && \
     ARCH=$(case $(uname -m) in aarch64) echo "arm64" ;; x86_64) echo "x64" ;; esac) && \
     curl -fsSL https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-${ARCH}.tar.xz | tar -xJ -C /usr/local --strip-components=1 && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
