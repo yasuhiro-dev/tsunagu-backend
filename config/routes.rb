@@ -51,6 +51,7 @@ Rails.application.routes.draw do
       post "/demo/prepare_guest", to: "demo#prepare_guest"
       post "/demo/assign", to: "demo#assign"
       post "/demo/reassign", to: "demo#reassign"
+      get "/child_availabilities", to: "child_availabilities#index"
     end
   end
 end
