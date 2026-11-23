@@ -3,6 +3,7 @@ module Authentication
 
   SECRET_KEY = Rails.application.credentials.secret_key_base || ENV["SECRET_KEY_BASE"]
 
+  # トークンが漏れたときの被害を小さくするため、有効期限を30分にしている
   def encode_token(payload, expires_in: 30.minutes)
     payload[:exp] = expires_in.from_now.to_i
     JWT.encode(payload, SECRET_KEY, "HS256")

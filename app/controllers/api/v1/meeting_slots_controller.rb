@@ -57,6 +57,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
           end_at: slot.end_at,
           status: slot.status,
           child_name: slot.assignments.first&.child&.name,
+          child_id: slot.assignments.first&.child&.id,
           assignment_id: slot.assignments.first&.id,
           submitted: slot.assignments.first&.child&.family&.submitted,
           class_room: teacher.class_rooms.first&.classname
