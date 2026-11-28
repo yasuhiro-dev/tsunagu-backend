@@ -7,7 +7,7 @@ class Family < ApplicationRecord
     # 保護者に見せる面談枠（担任の枠を、開始時刻で重複除去したもの）
     def selectable_slots
         teacher_ids = children.flat_map { |child| child.class_rooms.map(&:teacher_id) }
-        MeetingSlot.where(teacher_id: teacher_ids).includes(assignments: :child)
+        MeetingSlot.where(teacher_id: teacher_ids)
                    .group_by(&:start_at).map { |_, slots| slots.first }
     end
 
