@@ -30,7 +30,7 @@ module Api
             # 兄弟の情報
             siblings_info = siblings.map do |s|
             sibling_class_room = s.class_rooms.find { |r| r.room_type != "support" }&.classname
-            { name: s.name, class_room: sibling_class_room }
+            { name: s.name, class_room: sibling_class_room, child_id: s.id }
             end
 
             # 特別支援の面談

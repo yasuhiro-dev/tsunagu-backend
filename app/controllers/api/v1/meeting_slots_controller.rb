@@ -13,6 +13,7 @@ class Api::V1::MeetingSlotsController < ApplicationController
         end_at: slot.end_at,
         status: slot.status,
         child_name: slot.assignments.first&.child&.name
+
       }
     }
   end
