@@ -82,7 +82,13 @@ RSpec.describe "Api::V1::MeetingSlots", type: :request do
         subject
         expect(response).to have_http_status(:ok)
         res = JSON.parse(response.body)
-        expect(res.first.keys).to include("id", "start_at", "end_at", "status", "child_name")
+        expect(res.first.keys).to include("id", "start_at", "end_at", "status")
+      end
+
+      it "割り当て済みの枠でも、児童名は返さない" do
+        subject
+        res = JSON.parse(response.body)
+        expect(res.first.keys).not_to include("child_name")
       end
     end
 
