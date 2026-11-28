@@ -10,7 +10,7 @@ class Child < ApplicationRecord
   def siblings
     family.children.where.not(id: id)
   end
-  # その児童のクラスから、面談表・クラス名・担任名・児童名を取得
+  # その児童のクラスから、面談表・クラス名・担任名・児童名を取得（ドロワーで使用）
   def related_schedules
     class_rooms.map do |class_room|
     teacher = class_room.teacher
@@ -25,7 +25,8 @@ class Child < ApplicationRecord
         end_at: slot.end_at,
         status: slot.status,
         # assignmentsでアソシエーションが複数なので.firstにしてから取り出す
-        child_name: slot.assignments.first&.child&.name
+        child_name: slot.assignments.first&.child&.name,
+        child_id: slot.assignments.first&.child_id
         }
       } }
   end
